@@ -1,6 +1,19 @@
+import axios from 'axios';
+
 function LoginPage() {
+
+    function loginBtnClick() {
+        axios.get('http://localhost:8080/hello')
+            .then((response) => {
+                console.log('성공!');
+            })
+            .catch(() => {
+                console.error('에러발생');}
+        )
+    }
+
     return (
-        <>안녕!!!</>
+        <button onClick={()=> loginBtnClick()}>누르고 싶게 생긴 버튼</button>
     )
 }
 
