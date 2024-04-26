@@ -1,5 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react'
+import Swal from "sweetalert2";
 
 function LoginPage() {
 
@@ -21,8 +22,24 @@ function LoginPage() {
             },
         ).then((response) => {
             console.log(response.data);
-        }).catch(() => {
-            console.error('에러발생');
+        }).catch(error => {
+            const data = error.response.data
+            if(data.getCode === 'INTERNAL_SERVER_ERROR') {
+                Swal.fire({
+                    title: '실패',
+                    html: '예상하지 못한 에러가 발생했습니다.<br>다시 시도해주세요',
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+            }
+            else {
+                Swal.fire({
+                    title: '실패',
+                    html: data.getMessage,
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+            }
         });
     }
 
