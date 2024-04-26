@@ -7,13 +7,15 @@ import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberRepository
 import lombok.RequiredArgsConstructor
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 @RequiredArgsConstructor
 class MemberService (
-    private val memberRepository: MemberRepository
+    private val memberRepository: MemberRepository,
+    private val passwordEncoder: BCryptPasswordEncoder
 ){
     @Transactional
     fun join(dto : MemberCreate): Long {
@@ -28,8 +30,11 @@ class MemberService (
         val member: MemberEntity = memberRepository.findByMemberId(dto.memberId)
             ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원정보가 없습니다.")
 
-        if(member.password != dto.password) {
-            throw IllegalStateException("비밀번호 불일치")
+//        if(member.password != dto.password) {
+//            throw IllegalStateException("비밀번호 불일치")
+//        }
+        if(!passwordEncoder.matches(dto.password,member.password)) {
+            throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
         }
         return member.id!!;
     }
