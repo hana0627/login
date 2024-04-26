@@ -16,14 +16,14 @@ import java.time.LocalDateTime
 abstract class AuditingFields(
     @CreatedDate
     @Column(updatable = false)
-    var createdDate: LocalDateTime? = null, // 생성일시
+    var createdAt: LocalDateTime? = null, // 생성일시
 
     @CreatedBy
     @Column(updatable = false)
     var createdBy: String? = null, // 생성자
 
     @LastModifiedDate
-    var modifiedDate: LocalDateTime? = null, // 수정일시
+    var modifiedAt: LocalDateTime? = null, // 수정일시
 
     @LastModifiedBy
     var modifiedBy: String? = null, // 수정자

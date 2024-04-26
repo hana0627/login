@@ -14,20 +14,16 @@ function LoginPage() {
     }
 
     function loginBtnClick() {
-
-        axios.post('http://localhost:8080/hello',
+        axios.post('http://localhost:8080/api/v1/login',
             {
                 "memberId": memberId,
                 "password": password
-            }
-            )
-            .then((response) => {
-                console.log(response.data);
-            })
-            .catch(() => {
-                    console.error('에러발생');
-                }
-            )
+            },
+        ).then((response) => {
+            console.log(response.data);
+        }).catch(() => {
+            console.error('에러발생');
+        });
     }
 
     return (

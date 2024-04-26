@@ -26,7 +26,8 @@ class MemberService (
     }
 
     fun login(dto: MemberLogin): Long {
-        val member: MemberEntity = memberRepository.findByMemberId(dto.memberId) ?: throw IllegalStateException("없는 아이디!")
+        val member: MemberEntity = memberRepository.findByMemberId(dto.memberId) ?: throw IllegalStateException("회원가입된회원")
+
         if(member.password != dto.password) {
             throw IllegalStateException("비밀번호 불일치")
         }
