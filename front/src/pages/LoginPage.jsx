@@ -5,7 +5,7 @@ function LoginPage() {
     function loginBtnClick() {
         axios.get('http://localhost:8080/hello')
             .then((response) => {
-                console.log('성공!');
+                console.log(response.data);
             })
             .catch(() => {
                 console.error('에러발생');}
