@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
 import React, { useState } from 'react'
 import Swal from "sweetalert2";
 
@@ -6,6 +7,7 @@ function LoginPage() {
 
     const [memberId, setMemberId] = useState('')
     const [password, setPassword] = useState('')
+    const navigate = useNavigate()
 
     function memberIdHandle(e) {
         setMemberId(e.target.value)
@@ -43,15 +45,22 @@ function LoginPage() {
         });
     }
 
+
+    function SignupBtnClick () {
+        navigate('/SignupPage')
+    }
+
+
     return (
-        <>
+        <div className="login-page">
             <div className="login-wrapper">
                 <h2>Login</h2>
                     <input type="text" className = "login-input" placeholder="id" value={memberId} onChange={(e) => memberIdHandle(e)}/>
                     <input type="password" className = "login-input" value={password} placeholder="Password"  onChange={(e) => passwordHandle(e)}/>
+                    <div className="ft-s right" onClick={SignupBtnClick}>회원가입</div>
                     <button className="btn_purple" onClick={loginBtnClick}>로그인</button>
             </div>
-        </>
+        </div>
     )
 }
 

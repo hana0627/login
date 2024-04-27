@@ -1,0 +1,145 @@
+.login-page {
+    display: flex;
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center; /* 수직 가운데 정렬 */
+    height: 100vh; /* 화면 전체 높이 */
+    background-color: #f0f0f0; /* 배경색은 예시로 지정한 값 */
+}
+
+.login-wrapper {
+    width: 400px;
+    height: 400px;
+    padding: 40px;
+    box-sizing: border-box;
+    background-color: #fff; /* 예시로 추가한 배경색 */
+}
+
+
+.login-wrapper > h2{
+    font-size: 36px;
+    color: #6A24FE;
+    margin-bottom: 40px;
+}
+
+.login-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    margin-bottom: 16px;
+    border-radius: 6px;
+    background-color: #F8F8F8;
+}
+
+.btn_purple {
+    color: #fff;
+    font-size: 16px;
+    background-color: #6A24FE;
+    margin-top: 20px;
+    width: 320px;
+    height: 50px;
+}
+
+/* 폰트 */
+.ft-s {
+    font-size: 13px;
+}/* 폰트 */
+
+.ft-sm {
+    font-size: 15px;
+}
+
+
+.ft-bold {
+    font-weight: bold;
+}
+
+.right {
+    float: right;
+    margin-right: 10px;
+}
+
+.left {
+    float: left;
+}
+
+.ft-lightgrey {
+    color: lightgrey;
+}
+
+
+
+.margin-left-110 {
+    margin-left: 110px;
+}
+
+.right:hover {
+    cursor: pointer;
+}
+
+
+
+/* 회원가입 */
+.signup-page {
+    display: flex;
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center; /* 수직 가운데 정렬 */
+    height: 100vh; /* 화면 전체 높이 */
+    background-color: #f0f0f0; /* 배경색은 예시로 지정한 값 */
+}
+
+.signup-wrapper {
+    width: 500px;
+    height: 100vh;
+    padding: 40px;
+    background-color: #fff; /* 예시로 추가한 배경색 */
+    text-align: center; /* 좌측 정렬 */
+}
+
+
+.signup-wrapper > h2 {
+    width: 500px; /* 수정된 부분 */
+    display: inline-block; /* 추가된 부분 */
+    font-style: normal;
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 47px;
+    color: #6A24FE;
+    margin-top: 70px; /* 수정된 부분 */
+    margin-left: 20px; /* 수정된 부분 */
+    text-align: left; /* 좌측 정렬 */
+}
+
+.signup-wrapper .input {
+    padding: 0px;
+    border: none;
+    border-bottom: 1px solid #CFCFCF;
+    width: 100%; /* 수정된 부분 */
+    height: 30px;
+    margin-bottom: 20px; /* 수정된 부분 */
+}
+
+.signup-wrapper .input:hover {
+    border-bottom-color: #6A24FE;
+}
+
+.signup-wrapper > span {
+    display: inline-block; /* 추가된 부분 */
+    width: 100%; /* 수정된 부분 */
+    text-align: left; /* 좌측 정렬 */
+}
+
+.signup-wrapper button {
+    width: 400px;
+    height: 50px;
+    left: 725px;
+    top: 875px;
+    background-color: #FFFFFF;
+    color: #6A24FE;
+    border-radius: 8px;
+    border: #6A24FE solid 1px;
+}
+.signup-wrapper button:hover {
+    background-color: #6A24FE;
+    color: #FFFFFF;
+}
