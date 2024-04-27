@@ -38,6 +38,7 @@
     margin-top: 20px;
     width: 320px;
     height: 50px;
+    border-radius: 8px;
 }
 
 /* 폰트 */
@@ -119,6 +120,16 @@
     margin-bottom: 20px; /* 수정된 부분 */
 }
 
+.signup-wrapper .input-id {
+     padding: 0px;
+     border: none;
+     border-bottom: 1px solid #CFCFCF;
+     width: 70%; /* 수정된 부분 */
+     height: 30px;
+     margin-bottom: 20px; /* 수정된 부분 */
+    float: left; /* 좌측으로 배치 */
+}
+
 .signup-wrapper .input:hover {
     border-bottom-color: #6A24FE;
 }
@@ -129,7 +140,7 @@
     text-align: left; /* 좌측 정렬 */
 }
 
-.signup-wrapper button {
+.signup-wrapper .submit-button {
     width: 400px;
     height: 50px;
     left: 725px;
@@ -139,7 +150,24 @@
     border-radius: 8px;
     border: #6A24FE solid 1px;
 }
-.signup-wrapper button:hover {
+.signup-wrapper .submit-button:hover {
+    background-color: #6A24FE;
+    color: #FFFFFF;
+}
+
+
+.signup-wrapper .input-id + button {
+    margin-left: 5%; /* 아이디 입력란과 버튼 사이의 간격 조정 */
+    float: left; /* 버튼도 좌측으로 배치 */
+    height: 30px;
+    line-height: 30px; /* 버튼의 높이에 맞게 텍스트를 수직 정렬 */
+    background-color: #FFFFFF;
+    color: #6A24FE;
+    border-radius: 8px;
+    border: #6A24FE solid 1px;
+}
+
+.signup-wrapper .input-id + button:hover {
     background-color: #6A24FE;
     color: #FFFFFF;
 }
