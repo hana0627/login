@@ -1,5 +1,7 @@
 package com.hana.login.user.service
 
+import com.hana.login.common.exception.ApplicationException
+import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
@@ -46,7 +48,9 @@ class MemberServiceTest @Autowired constructor(
         val dto: MemberCreate = MemberCreate.fixture();
 
         //when & then
-        assertThrows<IllegalStateException> { memberService.join(dto) }
+        val result = assertThrows<ApplicationException> { memberService.join(dto) }
+        assertThat(result.errorCode).isEqualTo(ErrorCode.DUPLICATED_MEMBER_ID)
+        assertThat(result.message).isEqualTo("이미 가입된 회원입니다.")
     }
 
 
@@ -71,7 +75,10 @@ class MemberServiceTest @Autowired constructor(
         val dto: MemberLogin = MemberLogin.fixture(memberId = "wrongId")
 
         //when & then
-        assertThrows<IllegalStateException> { memberService.login(dto); }
+        val result = assertThrows<ApplicationException> { memberService.login(dto); }
+        assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
+        assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
+
 
     }
 }

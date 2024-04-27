@@ -28,11 +28,8 @@ class MemberService (
 
     fun login(dto: MemberLogin): Long {
         val member: MemberEntity = memberRepository.findByMemberId(dto.memberId)
-            ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원정보가 없습니다.")
+            ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
 
-//        if(member.password != dto.password) {
-//            throw IllegalStateException("비밀번호 불일치")
-//        }
         if(!passwordEncoder.matches(dto.password,member.password)) {
             throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
         }
