@@ -11,11 +11,15 @@ function SignupPage() {
     const [passwordCheck, setPasswordCheck] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
     const [memberIdCheck, setMemberIdCheck] = useState(false)
+    const [gender, setGender] = useState('')
+    const [agreed, setAgreed] = useState(false);
+
     const navigate = useNavigate()
 
 
     function memberIdHandle(e) {
         setMemberId(e.target.value)
+        setMemberIdCheck(false); // id 입력값 변경시 중복확인인증 해제
     }
 
     function memberNameHandle(e) {
@@ -34,6 +38,13 @@ function SignupPage() {
         setPhoneNumber(e.target.value)
     }
 
+    function handleGenderChange(e) {
+        setGender(e);
+    }
+
+    function handleAgreeChange(e) {
+        setAgreed(e.target.checked);
+    }
 
     function duplicateBtnClick() {
         console.log(memberId)
@@ -69,21 +80,138 @@ function SignupPage() {
         }
 
 
-        axios.get('http://localhost:8080/api/v1/duplicate/'+memberId)
+        axios.get('http://localhost:8080/api/v1/duplicate/' + memberId)
             .then(
-
                 Swal.fire({
-                title: '성공',
-                html: "사용가능한 아이디 입니다!",
+                    title: '성공',
+                    html: "사용가능한 아이디 입니다!",
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                })
+                    .then(result => {
+                        if (result.isConfirmed) {
+                            setMemberIdCheck(true);
+                        }
+                    })
+            ).catch(error => {
+            const data = error.response.data
+            if (data.getCode === 'INTERNAL_SERVER_ERROR') {
+                Swal.fire({
+                    title: '실패',
+                    html: '예상하지 못한 에러가 발생했습니다.<br>다시 시도해주세요',
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+            } else {
+                Swal.fire({
+                    title: '실패',
+                    html: data.getMessage,
+                    icon: 'warning',
+                    confirmButtonText: '확인'
+                });
+            }
+            return false;
+        })
+    }
+
+    function submitBtnClick() {
+        if (!memberIdCheck) {
+            Swal.fire({
+                title: '실패',
+                html: '아이디 중복확인을 진행해주세요.',
                 icon: 'warning',
                 confirmButtonText: '확인'
-            }).then((result) => {
-                    setMemberIdCheck(true);
-                    // if(result.isConfiremd)
-                }))
+            });
+            return false;
+        }
+        if (memberName === '') {
+            Swal.fire({
+                title: '실패',
+                html: '이름을 입력해주세요.',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
 
+        if (password === '') {
+            Swal.fire({
+                title: '실패',
+                html: '비밀번호를 입력해주세요.',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
 
-            .catch(error => {
+        if (passwordCheck === '') {
+            Swal.fire({
+                title: '실패',
+                html: '비밀번호 확인을 입력해주세요.',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
+
+        if (password !== passwordCheck) {
+            Swal.fire({
+                title: '실패',
+                html: '비밀번호가 일치하지 않습니다.',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
+        if (phoneNumber === '') {
+            Swal.fire({
+                title: '실패',
+                html: '전화번호를 입력해주세요',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
+
+        if (gender === '') {
+            Swal.fire({
+                title: '실패',
+                html: '성별을 선택해주세요',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
+
+        if (agreed !== true) {
+            Swal.fire({
+                title: '실패',
+                html: '약관에 동의해주세요',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            })
+            return false;
+        }
+        axios.post('http://localhost:8080/api/v1/join',
+            {
+                'memberId': memberId,
+                'memberName': memberName,
+                'password': password,
+                'phoneNumber': phoneNumber,
+                'gender': gender
+            }).then(() => {
+            Swal.fire({
+                title: '실패',
+                html: '회원가입이 완료되었습니다.',
+                icon: 'warning',
+                confirmButtonText: '확인'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    navigate('/menu');
+                }
+            });
+        })
+            .catch((error) => {
                 const data = error.response.data
                 if (data.getCode === 'INTERNAL_SERVER_ERROR') {
                     Swal.fire({
@@ -92,8 +220,7 @@ function SignupPage() {
                         icon: 'warning',
                         confirmButtonText: '확인'
                     });
-                }
-                else {
+                } else {
                     Swal.fire({
                         title: '실패',
                         html: data.getMessage,
@@ -101,12 +228,8 @@ function SignupPage() {
                         confirmButtonText: '확인'
                     });
                 }
-                return false;
             })
-    }
 
-    function submitBtnClick() {
-        alert("기능개발중입니다!")
     }
 
 
@@ -132,15 +255,19 @@ function SignupPage() {
                 <span className="ft-lightgrey">* 전화번호</span><br/><br/>
                 <input className="input" onChange={(e) => phoneNumberHandle(e)}/>
                 <div style={{textAlign: 'left'}}>
-                    <input type="radio" className="radio" name="gender"/><span className="ft-bold">남성</span>
-                    <input type="radio" className="radio" name="gender"/><span className="ft-bold">여성</span>
+
+                    <input type="radio" value="M" checked={gender === 'M'} onChange={() => handleGenderChange('M')}/>
+                    <span onChange={() => handleGenderChange('M')}>남성</span>
+                    <input type="radio" value="F" checked={gender === 'F'} onChange={() => handleGenderChange('F')}/>
+                    <span onChange={() => handleGenderChange('F')}>여성</span>
                 </div>
                 <br/><br/>
                 <div style={{textAlign: 'left'}}>
-                    <input type="checkbox" className="agree"/><span
+                    <input type="checkbox" checked={agreed} onChange={(e) => handleAgreeChange(e)}/><span
                     className="ft-bold">이용약관 개인정보 수집 및 정보이용에 동의합니다.</span><br/><br/><br/>
                 </div>
-                <button className="submit-button" onClick={() => submitBtnClick()}><span className="ft-sm ft-bold">가입하기</span></button>
+                <button className="submit-button" onClick={() => submitBtnClick()}><span
+                    className="ft-sm ft-bold">가입하기</span></button>
             </div>
         </div>
     )
