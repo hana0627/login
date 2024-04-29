@@ -18,8 +18,8 @@ class SecurityConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http.csrf { csrf -> csrf.disable() }
             .authorizeHttpRequests { auth -> auth
-                .requestMatchers("/api/v1/*").permitAll()
-                .requestMatchers("/api/v2/*").authenticated()}
+                .requestMatchers("/api/v1/**").permitAll()
+                .requestMatchers("/api/v2/**").authenticated()}
             .formLogin { form -> form.disable() }
             .httpBasic{ b -> b.disable()}
             .build()
