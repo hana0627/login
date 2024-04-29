@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.test.context.TestPropertySource
 
 
@@ -19,7 +20,9 @@ import org.springframework.test.context.TestPropertySource
 @TestPropertySource("classpath:test-application.properties")
 class MemberServiceTest @Autowired constructor(
     private val memberRepository: MemberRepository,
-    private val memberService: MemberService) {
+    private val memberService: MemberService,
+    private val passwordEncoder: BCryptPasswordEncoder
+) {
 
     @BeforeEach
     fun beforeEach() {
@@ -57,7 +60,7 @@ class MemberServiceTest @Autowired constructor(
     @Test
     fun 올바른_정보_입력시_로그인이_성공한다() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture()
+        val entity: MemberEntity = MemberEntity.fixture(password = passwordEncoder.encode("password"))
         memberRepository.save(entity)
         val dto: MemberLogin = MemberLogin.fixture()
 
@@ -70,7 +73,7 @@ class MemberServiceTest @Autowired constructor(
     @Test
     fun 아이디_혹은_패스워드가_일치하지_않을_시_예외를_생성한다() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture()
+        val entity: MemberEntity = MemberEntity.fixture(password = passwordEncoder.encode("password"))
         memberRepository.save(entity)
         val dto: MemberLogin = MemberLogin.fixture(memberId = "wrongId")
 

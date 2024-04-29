@@ -22,9 +22,18 @@ class MemberService (
         if (memberRepository.findByMemberId(dto.memberId) != null) {
             throw ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID,"이미 가입된 회원입니다.")
         }
-        val member: MemberEntity =  MemberEntity.of(dto);
+
+        val member: MemberEntity =  MemberEntity(
+            memberId = dto.memberId,
+            memberName = dto.memberName,
+            password = passwordEncoder.encode(dto.password),
+            phoneNumber = dto.phoneNumber,
+            gender = dto.gender,
+            id = null
+        )
         return memberRepository.save(member).id!!
     }
+
 
     fun login(dto: MemberLogin): Long {
         val member: MemberEntity = memberRepository.findByMemberId(dto.memberId)
@@ -34,5 +43,14 @@ class MemberService (
             throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
         }
         return member.id!!;
+    }
+
+    fun duplicateMember(memberId: String): Boolean {
+        if (memberRepository.findByMemberId(memberId) != null) {
+            throw ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID,"이미 가입된 회원입니다.")
+        }
+
+        return true;
+
     }
 }
