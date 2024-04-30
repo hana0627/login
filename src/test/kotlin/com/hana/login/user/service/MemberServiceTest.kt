@@ -71,7 +71,7 @@ class MemberServiceTest @Autowired constructor(
         //nothing
     }
     @Test
-    fun 아이디_혹은_패스워드가_일치하지_않을_시_예외를_생성한다() {
+    fun 로그인시_아이디가_일치하지_않으면_예외를_생성한다() {
         //given
         val entity: MemberEntity = MemberEntity.fixture(password = passwordEncoder.encode("password"))
         memberRepository.save(entity)
@@ -81,8 +81,47 @@ class MemberServiceTest @Autowired constructor(
         val result = assertThrows<ApplicationException> { memberService.login(dto); }
         assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
         assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
+    }
 
+    @Test
+    fun 로그인시_비밀번호가_일치하지_않으면_예외를_생성한다() {
+        //given
+        val entity: MemberEntity = MemberEntity.fixture(password = passwordEncoder.encode("password"))
+        memberRepository.save(entity)
+        val dto: MemberLogin = MemberLogin.fixture(password = "wrong_password")
 
+        //when & then
+        val result = assertThrows<ApplicationException> { memberService.login(dto); }
+        assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
+        assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
+    }
+
+    @Test
+    fun 아이디_중복검증_성공시_true를_반환한다() {
+        //given
+        val entity: MemberEntity = MemberEntity.fixture(
+            memberId= "hanana",
+            password = passwordEncoder.encode("password"))
+        memberRepository.save(entity)
+
+        //when
+        val result = memberService.duplicateMember("success_id")
+
+        //then
+        assertThat(result).isTrue()
+    }
+    @Test
+    fun 아이디_이미_쫀재하는_아이디이면_예외를_발생시킨다() {
+        //given
+        val entity: MemberEntity = MemberEntity.fixture(
+            memberId= "hanana",
+            password = passwordEncoder.encode("password"))
+        memberRepository.save(entity)
+
+        //when & then
+        val result = assertThrows<ApplicationException> { memberService.duplicateMember("hanana"); }
+        assertThat(result.errorCode).isEqualTo(ErrorCode.DUPLICATED_MEMBER_ID)
+        assertThat(result.message).isEqualTo("이미 가입된 회원입니다.")
     }
 }
 

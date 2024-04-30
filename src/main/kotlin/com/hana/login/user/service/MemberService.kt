@@ -19,19 +19,18 @@ class MemberService (
 ){
     @Transactional
     fun join(dto : MemberCreate): Long {
-        if (memberRepository.findByMemberId(dto.memberId) != null) {
-            throw ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID,"이미 가입된 회원입니다.")
+        if(duplicateMember(dto.memberId)) {
+            val member: MemberEntity =  MemberEntity(
+                memberId = dto.memberId,
+                memberName = dto.memberName,
+                password = passwordEncoder.encode(dto.password),
+                phoneNumber = dto.phoneNumber,
+                gender = dto.gender,
+                id = null
+            )
+            return memberRepository.save(member).id!!
         }
-
-        val member: MemberEntity =  MemberEntity(
-            memberId = dto.memberId,
-            memberName = dto.memberName,
-            password = passwordEncoder.encode(dto.password),
-            phoneNumber = dto.phoneNumber,
-            gender = dto.gender,
-            id = null
-        )
-        return memberRepository.save(member).id!!
+        throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
     }
 
 
@@ -49,8 +48,6 @@ class MemberService (
         if (memberRepository.findByMemberId(memberId) != null) {
             throw ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID,"이미 가입된 회원입니다.")
         }
-
         return true;
-
     }
 }

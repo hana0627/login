@@ -7,7 +7,7 @@ data class MemberLogin(
     companion object {
         fun fixture(
             memberId: String = "hanana9506",
-            password: String = "password", // TODO 암호화
+            password: String = "password",
         ) : MemberLogin {
             return MemberLogin(
                 memberId = memberId,
