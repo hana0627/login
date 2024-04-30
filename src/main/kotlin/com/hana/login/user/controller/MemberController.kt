@@ -30,4 +30,9 @@ class MemberController (
     fun login(@RequestBody requestDto: MemberLogin): Long {
         return memberService.login(requestDto);
     }
+
+    @GetMapping("/api/v1/auth")
+    fun MyPage() {
+        println("안녕!!")
+    }
 }

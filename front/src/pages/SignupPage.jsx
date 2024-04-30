@@ -207,7 +207,7 @@ function SignupPage() {
                 confirmButtonText: '확인'
             }).then(result => {
                 if (result.isConfirmed) {
-                    navigate('/menu');
+                    navigate('/login');
                 }
             });
         })

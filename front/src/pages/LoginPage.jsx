@@ -23,7 +23,12 @@ function LoginPage() {
                 "password": password
             },
         ).then((response) => {
-            console.log(response.data);
+            // TODO jwt토큰처리
+
+
+            navigate('/MyPage')
+
+
         }).catch(error => {
             const data = error.response.data
             if(data.getCode === 'INTERNAL_SERVER_ERROR') {
