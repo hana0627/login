@@ -36,6 +36,7 @@ class SecurityConfig (
 
             .httpBasic{ b -> b.disable()}
 
+            //jwt 필터추가
             .addFilterBefore(JwtFiler(secretKey = secretKey, jwtUtils = jwtUtils), UsernamePasswordAuthenticationFilter::class.java)
 
             .build()

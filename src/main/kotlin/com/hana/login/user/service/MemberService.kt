@@ -50,19 +50,10 @@ class MemberService(
             throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
         }
         // 토큰생성
-        val result = jwtUtils.generateToken(
+        return jwtUtils.generateToken(
             memberId = member.memberId,
             memberName = member.memberName
         )
-
-        // Authentication 객체 생성
-        val authentication: Authentication = UsernamePasswordAuthenticationToken(
-            member, null, mutableListOf()
-        )
-
-        // SecurityContext에 인증 설정
-        SecurityContextHolder.getContext().authentication = authentication
-        return result
     }
 
     fun duplicateMember(memberId: String): Boolean {

@@ -17,4 +17,4 @@ spring:
 jwt:
   secret-key: login.hana-applcation.secret_key
   #30min
-  token.expired-time-ms: 1800
+  token.expired-time-ms: 1800000
