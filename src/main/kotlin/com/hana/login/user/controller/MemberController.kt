@@ -4,6 +4,7 @@ import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.service.MemberService
 import lombok.RequiredArgsConstructor
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,11 +28,12 @@ class MemberController (
     }
 
     @PostMapping("/api/v1/login")
-    fun login(@RequestBody requestDto: MemberLogin): Long {
-        return memberService.login(requestDto);
+    fun login(@RequestBody requestDto: MemberLogin): ResponseEntity<String> {
+        val result:String = memberService.login(requestDto)
+        return ResponseEntity.ok(result)
     }
 
-    @GetMapping("/api/v1/auth")
+    @GetMapping("/api/v2/auth")
     fun MyPage() {
         println("안녕!!")
     }

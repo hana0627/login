@@ -7,9 +7,14 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
         format_sql: true
     open-in-view: false
+
+jwt:
+  secret-key: login.hana-applcation.secret_key
+  #30min
+  token.expired-time-ms: 1800

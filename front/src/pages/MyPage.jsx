@@ -6,7 +6,7 @@ function MyPage() {
     
     const [isRender, setIsRender] = useState(false)
 
-    axios.get('http://localhost:8080/api/v1/auth')
+    axios.get('http://localhost:8080/api/v2/auth')
         .then(response => {
             setIsRender(true)
         })
