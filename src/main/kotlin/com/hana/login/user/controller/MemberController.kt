@@ -34,7 +34,7 @@ class MemberController (
     }
 
     @GetMapping("/api/v2/auth")
-    fun MyPage() {
-        println("안녕!!")
+    fun MyPage(): ResponseEntity<Any> {
+        return ResponseEntity.ok("성공!")
     }
 }
