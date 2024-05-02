@@ -21,8 +21,9 @@ import org.springframework.test.context.TestPropertySource
 class MemberServiceTest @Autowired constructor(
     private val memberRepository: MemberRepository,
     private val memberService: MemberService,
-    private val passwordEncoder: BCryptPasswordEncoder
+    private val passwordEncoder: BCryptPasswordEncoder,
 ) {
+
 
     @BeforeEach
     fun beforeEach() {
@@ -58,18 +59,20 @@ class MemberServiceTest @Autowired constructor(
 
 
     @Test
-    fun 올바른_정보_입력시_로그인이_성공한다() {
+    fun 올바른_정보_입력시_로그인이_성공하고_jwt토큰을_return한다() {
         //given
         val entity: MemberEntity = MemberEntity.fixture(password = passwordEncoder.encode("password"))
         memberRepository.save(entity)
         val dto: MemberLogin = MemberLogin.fixture()
 
         //when
-        memberService.login(dto);
+        val result:String = memberService.login(dto);
 
         //then
-        //nothing
+        assertThat(result).isEqualTo("Bearer tokenHeader.tokenPayload.tokenSignature")
     }
+
+    
     @Test
     fun 로그인시_아이디가_일치하지_않으면_예외를_생성한다() {
         //given

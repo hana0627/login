@@ -16,17 +16,16 @@ import org.springframework.web.bind.annotation.RestController
 class MemberController (
     private val memberService: MemberService
 ){
+    @GetMapping("/api/v1/duplicate/{memberId}")
+    fun duplicateMember(@PathVariable memberId: String): ResponseEntity<Boolean> {
+        val result:Boolean = memberService.duplicateMember(memberId);
+        return ResponseEntity.ok(result)
+    }
 
     @PostMapping("/api/v1/join")
     fun saveMember(@RequestBody requestDto: MemberCreate): ResponseEntity<Long> {
         val result: Long =  memberService.join(requestDto);
 
-        return ResponseEntity.ok(result)
-    }
-
-    @GetMapping("/api/v1/duplicate/{memberId}")
-    fun duplicateMember(@PathVariable memberId: String): ResponseEntity<Boolean> {
-        val result:Boolean = memberService.duplicateMember(memberId);
         return ResponseEntity.ok(result)
     }
 
