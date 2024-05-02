@@ -18,3 +18,4 @@ jwt:
   secret-key: login.hana-applcation.secret_key
   #30min
   token.expired-time-ms: 1800
+  refresh.expired-time-ms: 4000
