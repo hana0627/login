@@ -22,13 +22,9 @@ function LoginPage() {
                 "memberId": memberId,
                 "password": password
             },
-        ).then((response) => {
-            // TODO jwt토큰처리
-
-
+        ).then(response => {
+            localStorage.setItem('accessToken',response.data);
             navigate('/MyPage')
-
-
         }).catch(error => {
             const data = error.response.data
             if(data.getCode === 'INTERNAL_SERVER_ERROR') {
