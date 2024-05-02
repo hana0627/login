@@ -1,9 +1,10 @@
 package com.hana.login.mock
 
 import com.hana.login.common.utils.JwtUtils
+import jakarta.servlet.http.HttpServletResponse
 
 class FakeJwtUtils : JwtUtils{
-    override fun generateToken(memberId: String, memberName: String): String {
+    override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String): String {
         return "Bearer tokenHeader.tokenPayload.tokenSignature"
     }
 

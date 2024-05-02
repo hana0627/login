@@ -3,6 +3,7 @@ package com.hana.login.user.controller
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.service.MemberService
+import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -30,8 +31,8 @@ class MemberController (
     }
 
     @PostMapping("/api/v1/login")
-    fun login(@RequestBody requestDto: MemberLogin): ResponseEntity<String> {
-        val result:String = memberService.login(requestDto)
+    fun login(@RequestBody requestDto: MemberLogin, response: HttpServletResponse): ResponseEntity<String> {
+        val result:String = memberService.login(requestDto, response)
         return ResponseEntity.ok(result)
     }
 

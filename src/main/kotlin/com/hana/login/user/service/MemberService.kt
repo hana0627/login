@@ -7,6 +7,7 @@ import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberRepository
+import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -38,7 +39,7 @@ class MemberService(
     }
 
 
-    fun login(dto: MemberLogin): String {
+    fun login(dto: MemberLogin, response: HttpServletResponse): String {
         val member: MemberEntity = memberRepository.findByMemberId(dto.memberId)
             ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
 
@@ -47,6 +48,7 @@ class MemberService(
         }
         // 토큰생성
         return jwtUtils.generateToken(
+            response = response,
             memberId = member.memberId,
             memberName = member.memberName
         )

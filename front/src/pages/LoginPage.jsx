@@ -22,6 +22,7 @@ function LoginPage() {
                 "memberId": memberId,
                 "password": password
             },
+            {withCredentials: true}
         ).then(response => {
             localStorage.setItem('accessToken',response.data);
             navigate('/MyPage')
@@ -45,7 +46,6 @@ function LoginPage() {
             }
         });
     }
-
 
     function SignupBtnClick () {
         navigate('/SignupPage')

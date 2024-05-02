@@ -6,6 +6,7 @@ import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberRepository
+import jakarta.servlet.http.HttpServletResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -81,6 +82,7 @@ class MemberServiceTest @Autowired constructor(
         val dto: MemberLogin = MemberLogin.fixture(memberId = "wrongId")
 
         //when & then
+        //TODO
         val result = assertThrows<ApplicationException> { memberService.login(dto); }
         assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
         assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
@@ -94,6 +96,7 @@ class MemberServiceTest @Autowired constructor(
         val dto: MemberLogin = MemberLogin.fixture(password = "wrong_password")
 
         //when & then
+        //TODO
         val result = assertThrows<ApplicationException> { memberService.login(dto); }
         assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
         assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
