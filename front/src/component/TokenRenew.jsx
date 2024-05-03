@@ -24,7 +24,11 @@ async function checkToken() {
 }
 
 async function renewToken() {
-    await axios.get('http://localhost:8080/api/v1/renewToken')
+    const accessToken = localStorage.getItem('accessToken')
+
+    await axios.get('http://localhost:8080/api/v2/regenerate',
+        {headers: {Authorization: accessToken}
+            ,withCredentials: true})
         .then(response => {
             localStorage.setItem('accessToken',response.data);
         }).catch(error => {
