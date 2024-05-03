@@ -10,11 +10,10 @@ import TokenRenew from "./component/TokenRenew";
 function App() {
     return (
         <div className="styleCss">
-            <TokenRenew/>
             <Routes>
+                <TokenRenew/>
                 <Route path='/login' element={<LoginPage/>}/>
                 <Route path='/SignupPage' element={<SignupPage/>}/>
-                <!-- 생략 -->
                 <Route path='/MyPage' element={<MyPage/>}/>
                 <Route path='/*' element={<div>없는페이지에옹</div>}/>
             </Routes>
