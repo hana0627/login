@@ -5,17 +5,21 @@ import SignupPage from "./pages/SignupPage";
 import MyPage from "./pages/MyPage"
 import styleCss from "./style.css"
 import './style.css';
+import TokenRenew from "./component/TokenRenew";
+
 function App() {
-  return (
-      <div className="styleCss">
-          <Routes>
-              <Route path='/login' element={<LoginPage/>} />
-              <Route path='/SignupPage' element={<SignupPage/>} />
-              <Route path='/MyPage' element={<MyPage/>} />
-              <Route path='/*' element={<div>없는페이지에옹</div>} />
-          </Routes>
-      </div>
-  );
+    return (
+        <div className="styleCss">
+            <TokenRenew/>
+            <Routes>
+                <Route path='/login' element={<LoginPage/>}/>
+                <Route path='/SignupPage' element={<SignupPage/>}/>
+                <!-- 생략 -->
+                <Route path='/MyPage' element={<MyPage/>}/>
+                <Route path='/*' element={<div>없는페이지에옹</div>}/>
+            </Routes>
+        </div>
+    );
 }
 
 export default App;
