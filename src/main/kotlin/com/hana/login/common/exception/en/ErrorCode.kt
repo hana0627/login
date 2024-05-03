@@ -11,6 +11,6 @@ enum class ErrorCode(
     DUPLICATED_MEMBER_ID(HttpStatus.CONFLICT,"중복된 아이디 입니다."),
     // 존재하지 않는 회원
     MEMBER_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
-    // 권한 부족
-    INVALID_PERMISSION(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다.")
+    // 권한 없음
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
 }
