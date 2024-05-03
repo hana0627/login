@@ -1,7 +1,9 @@
 package com.hana.login.user.controller
 
+import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
+import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.service.MemberService
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
@@ -15,7 +17,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequiredArgsConstructor
 class MemberController (
-    private val memberService: MemberService
+    private val memberService: MemberService,
+    private val jwtUtils: JwtUtils,
 ){
     @GetMapping("/api/v1/duplicate/{memberId}")
     fun duplicateMember(@PathVariable memberId: String): ResponseEntity<Boolean> {
@@ -32,7 +35,16 @@ class MemberController (
 
     @PostMapping("/api/v1/login")
     fun login(@RequestBody requestDto: MemberLogin, response: HttpServletResponse): ResponseEntity<String> {
-        val result:String = memberService.login(requestDto, response)
+
+        val member: MemberEntity = memberService.login(requestDto)
+
+        // 토큰생성
+        val result =  jwtUtils.generateToken(
+            response = response,
+            memberId = member.memberId,
+            memberName = member.memberName
+        )
+
         return ResponseEntity.ok(result)
     }
 

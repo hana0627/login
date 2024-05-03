@@ -54,10 +54,9 @@ class JwtUtilsImpl(
 
         val claims: Claims = Jwts.claims()
         claims.put("memberName", memberName)
-//        claims.put("memberId", memberId)
+        claims.put("memberId", memberId)
 
         return "Bearer " + Jwts.builder()
-            .setSubject(memberId)
             .setClaims(claims)
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + expiredMs * 1000))
@@ -80,7 +79,8 @@ class JwtUtilsImpl(
      * token -> 회원 아이디 추출
      */
     override fun getMemberId(token: String): String {
-        return extreactClaims(token).subject
+        val claims: Claims = extreactClaims(token)
+        return claims["memberId"].toString()
     }
 
     /**
@@ -148,8 +148,13 @@ class JwtUtilsImpl(
 
         val expired: Date = Date(Date().time + (refreshMs * 1000))
 
+
+        val claims: Claims = Jwts.claims()
+        claims.put("memberId", memberId)
+
+
         val result: String = Jwts.builder()
-            .setSubject(memberId)
+            .setClaims(claims)
             .setExpiration(expired)
             .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
             .compact()

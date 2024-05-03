@@ -9,8 +9,8 @@ class WebConfig : WebMvcConfigurer {
 
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            // .allowedOrigins("*") // 모든 origins에 대해 오픈하는것은 보안취약점이 될 수 있으므로 피하자!
-                                    // 또한 저렇게 하면 ssl 연동시에 뭔가.. 문제가 발생했었던.. 것.. 같다...
-            .allowedOrigins("http://localhost:3000", "https://mydamin.com")
+            .allowedOrigins("http://localhost:3002", "https://mydamin.com")
+            .allowedMethods("GET","POST","PATCH","DELETE")
+            .allowCredentials(true)
     }
 }

@@ -1,12 +1,12 @@
 package com.hana.login.user.service
 
+import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberRepository
-import jakarta.servlet.http.HttpServletResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,17 +60,30 @@ class MemberServiceTest @Autowired constructor(
 
 
     @Test
-    fun 올바른_정보_입력시_로그인이_성공하고_jwt토큰을_return한다() {
+    fun 올바른_정보_입력시_로그인이_성공하고_회원정보를_반환한다() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture(password = passwordEncoder.encode("password"))
+        val entity: MemberEntity = MemberEntity.fixture(
+            memberId = "hanana0627",
+            memberName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01011112222",
+            gender = Gender.F,
+            )
         memberRepository.save(entity)
-        val dto: MemberLogin = MemberLogin.fixture()
+        val dto: MemberLogin = MemberLogin.fixture(
+            memberId = "hanana0627",
+            password = "password",
+        )
 
         //when
-        val result:String = memberService.login(dto);
+        val result:MemberEntity = memberService.login(dto);
 
         //then
-        assertThat(result).isEqualTo("Bearer tokenHeader.tokenPayload.tokenSignature")
+        assertThat(result.memberId).isEqualTo("hanana0627")
+        assertThat(result.memberName).isEqualTo("박하나")
+        assertThat(true).isEqualTo(passwordEncoder.matches("password", result.password))
+        assertThat(result.phoneNumber).isEqualTo("01011112222")
+        assertThat(result.gender).isEqualTo(Gender.F)
     }
 
     
@@ -82,7 +95,6 @@ class MemberServiceTest @Autowired constructor(
         val dto: MemberLogin = MemberLogin.fixture(memberId = "wrongId")
 
         //when & then
-        //TODO
         val result = assertThrows<ApplicationException> { memberService.login(dto); }
         assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
         assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
@@ -96,7 +108,6 @@ class MemberServiceTest @Autowired constructor(
         val dto: MemberLogin = MemberLogin.fixture(password = "wrong_password")
 
         //when & then
-        //TODO
         val result = assertThrows<ApplicationException> { memberService.login(dto); }
         assertThat(result.errorCode).isEqualTo(ErrorCode.MEMBER_NOT_FOUNT)
         assertThat(result.message).isEqualTo("회원 정보가 없습니다.")
@@ -117,7 +128,7 @@ class MemberServiceTest @Autowired constructor(
         assertThat(result).isTrue()
     }
     @Test
-    fun 아이디_이미_쫀재하는_아이디이면_예외를_발생시킨다() {
+    fun 아이디_이미_존재하는_아이디이면_예외를_발생시킨다() {
         //given
         val entity: MemberEntity = MemberEntity.fixture(
             memberId= "hanana",

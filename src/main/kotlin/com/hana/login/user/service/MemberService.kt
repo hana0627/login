@@ -7,7 +7,6 @@ import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberRepository
-import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional
 class MemberService(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
-    private val jwtUtils: JwtUtils
 ) {
 
 
@@ -39,19 +37,15 @@ class MemberService(
     }
 
 
-    fun login(dto: MemberLogin, response: HttpServletResponse): String {
+    fun login(dto: MemberLogin): MemberEntity {
         val member: MemberEntity = memberRepository.findByMemberId(dto.memberId)
             ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
 
         if (!passwordEncoder.matches(dto.password, member.password)) {
             throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
         }
-        // 토큰생성
-        return jwtUtils.generateToken(
-            response = response,
-            memberId = member.memberId,
-            memberName = member.memberName
-        )
+
+        return member
     }
 
     fun duplicateMember(memberId: String): Boolean {
