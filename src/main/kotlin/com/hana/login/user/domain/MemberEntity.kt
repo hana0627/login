@@ -8,7 +8,7 @@ import jakarta.persistence.*
 @Entity
 @Table(name = "member_account")
 data class MemberEntity(
-    @Column(length = 50, updatable = false)
+    @Column(length = 100, updatable = false)
     var memberId: String,
     @Column(length = 50)
     var memberName: String,
