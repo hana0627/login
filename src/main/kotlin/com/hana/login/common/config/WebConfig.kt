@@ -9,7 +9,7 @@ class WebConfig : WebMvcConfigurer {
 
     override fun addCorsMappings(registry: CorsRegistry) {
         registry.addMapping("/**")
-            .allowedOrigins("http://localhost:3001", "https://mydamin.com")
+            .allowedOrigins("http://localhost:3000", "https://accounts.google.com", "http://localhost:8080", "https://mydomain.com", "http://localhost:8080/login/oauth2/code/google")
             .allowedMethods("GET","POST","PATCH","DELETE")
             .allowCredentials(true)
     }
