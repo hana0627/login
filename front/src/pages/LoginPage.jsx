@@ -16,6 +16,7 @@ function LoginPage() {
         setPassword(e.target.value)
     }
 
+
     function loginBtnClick() {
         if(memberId === '' ) {
             Swal.fire({
@@ -35,8 +36,8 @@ function LoginPage() {
             });
             return false;
         }
-        
-        
+
+
         axios.post('http://localhost:8080/api/v1/login',
             {
                 "memberId": memberId,
@@ -67,9 +68,9 @@ function LoginPage() {
         });
     }
 
-    function googleLogin() {
-        alert('구현중입니다')
-    }
+    // function googleLogin() {
+    //     axios.get("http://localhost:8080/oauth2/authorization/google", {withCredentials: true})
+    // }
 
     function naverLogin() {
         alert('구현중입니다.')
@@ -87,12 +88,14 @@ function LoginPage() {
         <div className="login-page">
             <div className="login-wrapper">
                 <h2>Login</h2>
-                    <input type="text" className = "login-input" placeholder="id" value={memberId} onChange={(e) => memberIdHandle(e)}/>
-                    <input type="password" className = "login-input" value={password} placeholder="Password"  onChange={(e) => passwordHandle(e)}/>
-                    <img src="/img/google_login.jpg" className="btn_login" onClick={googleLogin} alt="구글로그인"/>
-                    <img src="/img/naver_login.jpg" className="btn_login" onClick={naverLogin} alt="네이버로그인"/>
-                    <img src="/img/kakao_login.jpg" className="btn_login" onClick={kakaoLogin} alt="카카오로그인"/>
-                    <button className="btn_purple btn_login" onClick={loginBtnClick}>로그인</button>
+                <input type="text" className="login-input" placeholder="id" value={memberId}
+                       onChange={(e) => memberIdHandle(e)}/>
+                <a href="http://localhost:8080/oauth2/authorization/google">
+                    <img src="/img/google_login.jpg" className="btn_login" alt="구글로그인"/>
+                </a>
+                <img src="/img/naver_login.jpg" className="btn_login" onClick={naverLogin} alt="네이버로그인"/>
+                <img src="/img/kakao_login.jpg" className="btn_login" onClick={kakaoLogin} alt="카카오로그인"/>
+                <button className="btn_purple btn_login" onClick={loginBtnClick}>로그인</button>
                 <br/><br/>
                 <div className="ft-s right" onClick={SignupBtnClick}>아직 회원이 아니신가요?</div>
 
