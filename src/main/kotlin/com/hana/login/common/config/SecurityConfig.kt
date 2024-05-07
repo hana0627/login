@@ -3,7 +3,7 @@ package com.hana.login.common.config
 import com.hana.login.common.config.filter.JwtFiler
 import com.hana.login.common.domain.CustomUserDetails
 import com.hana.login.common.utils.JwtUtils
-import com.hana.login.user.service.PrincipalOauth2UserService
+import com.hana.login.common.config.oauth2.PrincipalOauth2UserService
 import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
