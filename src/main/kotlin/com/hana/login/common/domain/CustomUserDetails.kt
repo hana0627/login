@@ -16,7 +16,7 @@ class CustomUserDetails(
         return memberEntity.memberId
     }
 
-    //oauth
+    // oauth2
     override fun getAttributes(): MutableMap<String, Any> {
         return attributes
     }

@@ -42,20 +42,15 @@ class SecurityConfig(
 
             //oauth2 로그인
             .oauth2Login { o ->
-                o.loginPage("http://localhost:3000/login") // 권한 접근 실패 시 로그인 페이지로 이동
-                o.defaultSuccessUrl("http://localhost:3000/myPage") // 로그인 성공 시 이동할 페이지
-                .userInfoEndpoint { userInfoEndpoint ->
-                            userInfoEndpoint.userService(principalOauth2UserService)
-
-                }
+                o.loginPage("http://localhost:3000/login") // 권한 없을시
+                    .userInfoEndpoint { userInfoEndpoint ->
+                        userInfoEndpoint.userService(principalOauth2UserService)
+                    }
                     .successHandler { _, response, authentication ->
                         val principal: CustomUserDetails = authentication.principal as CustomUserDetails
                         val jwtToken = jwtUtils.generateToken(response, principal.name, principal.getMemberName())
-                        response.addHeader("Authorization", "Bearer $jwtToken")
-                        //TODO redirectURL -> 서버응답으로 변경하여 로그인 시도하기??
-                        response.sendRedirect("http://localhost:3000/myPage")
+                        response.sendRedirect("http://localhost:3000/login?token=$jwtToken")
                     }
-
             }
 
             .addFilterBefore(

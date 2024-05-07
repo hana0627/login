@@ -24,7 +24,6 @@ class JwtFiler(
         filterChain: FilterChain
     ) {
 
-        println("request.requestURL = ${request.requestURL}")
         // permitAll으로 지정된 경로에 대해서는 jwt필터처리 수행x
         if (request.requestURL.contains("/api/v1")) {
             filterChain.doFilter(request, response)

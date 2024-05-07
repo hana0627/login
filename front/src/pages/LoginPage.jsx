@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'
-import React, { useState } from 'react'
+import {useLocation, useNavigate} from 'react-router-dom'
+import React, {useEffect, useState} from 'react'
 import Swal from "sweetalert2";
 
 function LoginPage() {
@@ -8,6 +8,22 @@ function LoginPage() {
     const [memberId, setMemberId] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
+
+    const location = useLocation();
+
+
+    useEffect(() => {
+        // URL에서 토큰 추출
+        const urlParams = new URLSearchParams(location.search);
+        const token = urlParams.get('token');
+        // 토큰이 존재하면 저장
+        if(token) {
+            localStorage.setItem('accessToken',token);
+            navigate('/MyPage')
+        }
+
+    }, [location]);
+
 
     function memberIdHandle(e) {
         setMemberId(e.target.value)
@@ -67,10 +83,6 @@ function LoginPage() {
             }
         });
     }
-
-    // function googleLogin() {
-    //     axios.get("http://localhost:8080/oauth2/authorization/google", {withCredentials: true})
-    // }
 
     function naverLogin() {
         alert('구현중입니다.')

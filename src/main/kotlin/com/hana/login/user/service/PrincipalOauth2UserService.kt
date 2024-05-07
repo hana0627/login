@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service
 @RequiredArgsConstructor
 class PrincipalOauth2UserService(
     private val memberRepository: MemberRepository,
-    private val jwtUtilsImpl: JwtUtilsImpl,
 ): DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest?): CustomUserDetails {
@@ -33,7 +32,8 @@ class PrincipalOauth2UserService(
         val memberId: String = provider + "_" + providerId
         val userName: String = oauth2User.getAttribute<String>("name")!!
         val optionalMember:MemberEntity? = memberRepository.findByMemberId(memberId)
-        var memberEntity:MemberEntity
+        val memberEntity: MemberEntity
+
         if(optionalMember == null) {
             memberEntity = MemberEntity(
                 memberId = memberId,
@@ -45,7 +45,7 @@ class PrincipalOauth2UserService(
             )
             memberRepository.save(memberEntity)
         } else {
-            memberEntity = optionalMember!!
+            memberEntity = optionalMember
         }
 
         return CustomUserDetails(memberEntity, oauth2User.attributes)
