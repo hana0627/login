@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor
 
 @RequiredArgsConstructor
 class NaverUserInfo(
-    private val attributes: Map<String, String>
+    private val attributes: Map<String, Any>
 ) : Oauth2UserInfo {
     override fun getProviderId(): String {
-        return attributes["id"].toString()
+        return attributes["id"] as String
     }
 
     override fun getProvider(): String {
@@ -17,11 +17,11 @@ class NaverUserInfo(
     }
 
     override fun getEmail(): String {
-        return attributes["email"].toString()
+        return attributes["email"] as String
     }
 
     override fun getName(): String {
-        return attributes["name"].toString()
+        return attributes["name"] as String
     }
 
     override fun getGender(): Gender {
@@ -29,6 +29,6 @@ class NaverUserInfo(
     }
 
     override fun getPhoneNumber(): String? {
-        return attributes["mobile"]
+        return attributes["mobile"] as String?
     }
 }
