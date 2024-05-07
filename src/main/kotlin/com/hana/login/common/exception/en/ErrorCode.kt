@@ -13,4 +13,6 @@ enum class ErrorCode(
     MEMBER_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
     // 권한 없음
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
+    // 권한 없음
+    UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 로그인 타입입니다."),
 }
