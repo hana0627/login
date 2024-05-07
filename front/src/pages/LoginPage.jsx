@@ -110,7 +110,11 @@ function LoginPage() {
                 <a href="http://localhost:8080/oauth2/authorization/naver">
                     <img src="/img/naver_login.jpg" className="btn_login" alt="네이버로그인"/>
                 </a>
-                <img src="/img/kakao_login.jpg" className="btn_login" onClick={kakaoLogin} alt="카카오로그인"/>
+
+                <a href="http://localhost:8080/oauth2/authorization/kakao">
+                    <img src="/img/kakao_login.jpg" className="btn_login" alt="카카오로그인"/>
+                </a>
+                {/*<img src="/img/kakao_login.jpg" className="btn_login" onClick={kakaoLogin} alt="카카오로그인"/>*/}
                 <button className="btn_purple btn_login" onClick={loginBtnClick}>로그인</button>
                 <br/><br/>
                 <div className="ft-s right" onClick={SignupBtnClick}>아직 회원이 아니신가요?</div>
