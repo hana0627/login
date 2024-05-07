@@ -102,10 +102,14 @@ function LoginPage() {
                 <h2>Login</h2>
                 <input type="text" className="login-input" placeholder="id" value={memberId}
                        onChange={(e) => memberIdHandle(e)}/>
+                <input type="password" className="login-input" placeholder="password" value={password}
+                       onChange={(e) => passwordHandle(e)}/>
                 <a href="http://localhost:8080/oauth2/authorization/google">
                     <img src="/img/google_login.jpg" className="btn_login" alt="구글로그인"/>
                 </a>
-                <img src="/img/naver_login.jpg" className="btn_login" onClick={naverLogin} alt="네이버로그인"/>
+                <a href="http://localhost:8080/oauth2/authorization/naver">
+                    <img src="/img/naver_login.jpg" className="btn_login" alt="네이버로그인"/>
+                </a>
                 <img src="/img/kakao_login.jpg" className="btn_login" onClick={kakaoLogin} alt="카카오로그인"/>
                 <button className="btn_purple btn_login" onClick={loginBtnClick}>로그인</button>
                 <br/><br/>
