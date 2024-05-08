@@ -4,6 +4,7 @@ package com.hana.login.user.controller
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.en.ErrorCode
+import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
@@ -34,12 +35,20 @@ class MemberControllerTest @Autowired constructor(
     private val mvc: MockMvc,
     private val passwordEncoder: BCryptPasswordEncoder,
     private val memberRepository: MemberRepository,
+    private val tokenRepository: TokenRepository,
 
     ) {
 
+    private val secretKey: String = "testSecret01234567890testSecrettest0987654321"
+
+    private val expiredMs: Long = 1800
+
+    private val refreshMs: Long = 5000
+
     @BeforeEach
     fun beforeEach() {
-        memberRepository.deleteAll();
+        memberRepository.deleteAll()
+        tokenRepository.deleteAll()
     }
 
 
@@ -107,7 +116,7 @@ class MemberControllerTest @Autowired constructor(
     }
 
     @Test
-    fun 어떠한_이유로_중복된_아이디_입력시_예외를_발생한다() {
+    fun 회원가입시_중복된_아이디인_경우_예외를_발생한다() {
         //given
         val member: MemberEntity = MemberEntity.fixture(
             memberId = "hanana0627"
@@ -132,7 +141,7 @@ class MemberControllerTest @Autowired constructor(
     }
 
     @Test
-    fun 올바른_정보를_입력하면_로그인이_성공하고_jwt_토큰을_반환한다() {
+    fun 올바른_정보를_입력하면_로그인이_성공하고_jwt_토큰을_응답으로_내리고_쿠키로_refresh_토큰을_반환한다() {
         //given
         val member: MemberEntity = MemberEntity.fixture(
             memberId = "hanana0627",
@@ -152,9 +161,10 @@ class MemberControllerTest @Autowired constructor(
                 .contentType(APPLICATION_JSON)
                 .content(json)
         )
-            .andExpect(status().isOk)
-            .andExpect(content().string("Bearer tokenHeader.tokenPayload.tokenSignature"))
             .andDo(print())
+            .andExpect(status().isOk)
+            .andExpect(content().string("Bearer $secretKey${member.memberId}${member.memberName}$expiredMs"))
+            .andExpect(cookie().value("refresh", "Refresh$secretKey${member.memberId}$refreshMs"))
 
     }
 
