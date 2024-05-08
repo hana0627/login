@@ -9,7 +9,7 @@ class GoogleUserInfo(
     private val attributes: Map<String, Any>
 ) : Oauth2UserInfo {
     override fun getProviderId(): String {
-        return attributes["sub"] as String
+        return attributes["sub"].toString()
     }
 
     override fun getProvider(): String {
