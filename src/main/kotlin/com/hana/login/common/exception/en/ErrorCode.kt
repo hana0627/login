@@ -15,4 +15,6 @@ enum class ErrorCode(
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "접근 권한이 없습니다."),
     // 권한 없음
     UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, "지원하지 않는 로그인 타입입니다."),
+    // jwt토큰 없음
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "jwt토큰을 찾을 수 없습니다."),
 }

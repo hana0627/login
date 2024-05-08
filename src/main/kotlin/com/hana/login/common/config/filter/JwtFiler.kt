@@ -29,7 +29,6 @@ class JwtFiler(
             filterChain.doFilter(request, response)
         }
         else {
-            println("1111111111111")
             // get Header
             val header: String? = request.getHeader(HttpHeaders.AUTHORIZATION)
 

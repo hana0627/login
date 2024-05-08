@@ -17,6 +17,8 @@ import org.springframework.http.ResponseCookie
 import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.*
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 @SpringBootTest
 class FakeJwtUtils @Autowired constructor(
@@ -34,7 +36,7 @@ class FakeJwtUtils @Autowired constructor(
     override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String): String {
 
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("SecretKey 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
         // refreshToken 쿠키에 저장 - start
         val refreshCookie: ResponseCookie = createRefreshToken(memberId)
@@ -64,11 +66,11 @@ class FakeJwtUtils @Autowired constructor(
 
     override fun reGenerateToken(response: HttpServletResponse, accessToken: String, refreshToken: String?): String {
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("SecretKey 혹은 expiredMs가 존재하지 않습니다.")
+            throw throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         if (refreshToken == null) {
-            throw NullPointerException("accessToken 혹은 refreshToken이 존재하지 않습니다.")
+            throw throw ApplicationException(ErrorCode.TOKEN_NOT_FOUND,"accessToken 혹은 refreshToken이 존재하지 않습니다.")
         }
 
         // token 검증 - start
@@ -105,13 +107,15 @@ class FakeJwtUtils @Autowired constructor(
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다")
         }
     }
-
+    private fun generateSignature(headerAndClaims: String): String {
+        return "NOT USED"
+    }
 
 
     // 토큰 claims 정보 추출
     private fun extreactClaims(token: String): Claims {
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("key 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"key 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         return Jwts.parserBuilder().setSigningKey(getKey(secretKey))
@@ -123,9 +127,10 @@ class FakeJwtUtils @Autowired constructor(
         val keyByte: ByteArray = key.toByteArray(StandardCharsets.UTF_8)
         return Keys.hmacShaKeyFor(keyByte)
     }
+
     private fun createRefreshToken(memberId: String): ResponseCookie {
         if (refreshMs == null || secretKey == null) {
-            throw NullPointerException("secretKey 혹은 refreshMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"secretKey 혹은 refreshMs가 존재하지 않습니다.")
         }
 
         val claims: Claims = Jwts.claims()

@@ -2,6 +2,7 @@ package com.hana.login.common.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.hana.login.common.domain.Token
+import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberRepository
@@ -70,8 +71,11 @@ class TokenControllerTest @Autowired constructor(
 
         //when & then
         mvc.perform(get("/api/v2/regenerate")
+            .cookie(Cookie("something","somethingValue"))
             .header(HttpHeaders.AUTHORIZATION,"Bearer $secretKey${member.memberId}${member.memberName}$expiredMs"))
-            .andExpect(status().is5xxServerError)
+            .andExpect(status().isNotFound)
+            .andExpect(jsonPath("$.errorCode").value(ErrorCode.TOKEN_NOT_FOUND.toString()))
+            .andExpect(jsonPath("$.message").value("accessToken 혹은 refreshToken이 존재하지 않습니다."))
             .andDo(print())
     }
 

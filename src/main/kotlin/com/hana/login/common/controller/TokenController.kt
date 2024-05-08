@@ -22,7 +22,7 @@ class TokenController(
     @GetMapping("/api/v2/regenerate")
     fun renewToken(request: HttpServletRequest,
                    response : HttpServletResponse,
-                   @RequestHeader("Authorization") authorization: String?,
+                   @RequestHeader("Authorization") authorization: String,
                    ): String {
 
         val cookies = request.cookies
@@ -33,9 +33,7 @@ class TokenController(
                 refreshToken = cookie.value
             }
         }
-        if(authorization == null) {
-            throw ApplicationException(ErrorCode.UNAUTHORIZED, "jwt토큰이 올바르지 않습니다.")
-        }
+
         val accessToken: String = authorization.split(" ")[1].trim()
 
         return jwtUtils.reGenerateToken(response, accessToken, refreshToken)

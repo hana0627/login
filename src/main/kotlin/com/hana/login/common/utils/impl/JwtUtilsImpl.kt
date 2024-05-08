@@ -49,7 +49,7 @@ class JwtUtilsImpl(
         memberName: String,
     ): String {
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("SecretKey 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
         // refreshToken 쿠키에 저장 - start
         val refreshCookie: ResponseCookie = createRefreshToken(memberId)
@@ -108,11 +108,11 @@ class JwtUtilsImpl(
 
     override fun reGenerateToken(response: HttpServletResponse, accessToken: String, refreshToken: String?): String {
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("SecretKey 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         if (refreshToken == null) {
-            throw NullPointerException("accessToken 혹은 refreshToken이 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.TOKEN_NOT_FOUND, "refreshToken이 존재하지 않습니다.")
         }
 
         // token 검증 - start
@@ -165,7 +165,7 @@ class JwtUtilsImpl(
 
     private fun generateSignature(headerAndClaims: String): String {
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("key 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"key 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         // 시크릿 키를 바이트 배열로 변환
@@ -187,7 +187,7 @@ class JwtUtilsImpl(
     // 토큰 claims 정보 추출
     private fun extreactClaims(token: String): Claims {
         if (secretKey == null || expiredMs == null) {
-            throw NullPointerException("key 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "key 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         return Jwts.parserBuilder().setSigningKey(getKey(secretKey))
@@ -201,7 +201,7 @@ class JwtUtilsImpl(
     }
     private fun createRefreshToken(memberId: String): ResponseCookie {
         if (refreshMs == null || secretKey == null) {
-            throw NullPointerException("secretKey 혹은 refreshMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "secretKey 혹은 refreshMs가 존재하지 않습니다.")
         }
 
         val claims: Claims = Jwts.claims()
