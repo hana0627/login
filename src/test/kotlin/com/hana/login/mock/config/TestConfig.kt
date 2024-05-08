@@ -2,7 +2,7 @@ package com.hana.login.mock.config
 
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.common.utils.JwtUtils
-import com.hana.login.mock.FakeJwtUtils
+import com.hana.login.mock.utils.FakeJwtUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

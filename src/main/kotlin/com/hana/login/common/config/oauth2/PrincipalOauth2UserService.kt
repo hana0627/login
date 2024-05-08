@@ -74,7 +74,6 @@ class PrincipalOauth2UserService(
     }
 
 
-
     private fun getMember(oauth2UserInfo: Oauth2UserInfo): MemberEntity {
         val provider: String = oauth2UserInfo.getProvider()
         val providerId: String = oauth2UserInfo.getProviderId()

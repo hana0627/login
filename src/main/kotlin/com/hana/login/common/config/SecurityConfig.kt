@@ -42,14 +42,18 @@ class SecurityConfig(
 
             //oauth2 로그인
             .oauth2Login { o ->
-                o.loginPage("http://localhost:3000/login") // 권한 없을시
-                    .userInfoEndpoint { userInfoEndpoint ->
-                        userInfoEndpoint.userService(principalOauth2UserService)
+//                o.loginPage("http://localhost:3000/login") // 권한 없을시
+                    o.userInfoEndpoint { userInfoEndpoint ->
+//                        userInfoEndpoint.userService(principalOauth2UserService)
+//                        userInfoEndpoint.userService(Oauth)
                     }
                     .successHandler { _, response, authentication ->
                         val principal: CustomUserDetails = authentication.principal as CustomUserDetails
                         val jwtToken = jwtUtils.generateToken(response, principal.name, principal.getMemberName())
                         response.sendRedirect("http://localhost:3000/login?token=$jwtToken")
+                    }
+                    .failureHandler() { _, response, authentication ->
+                        println("실패")
                     }
             }
 

@@ -1,4 +1,4 @@
-package com.hana.login.mock
+package com.hana.login.mock.utils
 
 import com.hana.login.common.domain.Token
 import com.hana.login.common.exception.ApplicationException
@@ -17,8 +17,6 @@ import org.springframework.http.ResponseCookie
 import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.*
-import javax.crypto.Mac
-import javax.crypto.spec.SecretKeySpec
 
 @SpringBootTest
 class FakeJwtUtils @Autowired constructor(

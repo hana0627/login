@@ -1,13 +1,9 @@
 package com.hana.login.common.controller
 
-import com.hana.login.common.exception.ApplicationException
-import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.utils.JwtUtils
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
-import org.springframework.boot.web.server.Cookie
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
