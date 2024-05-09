@@ -6,10 +6,12 @@ import com.hana.login.common.utils.JwtUtils
 import com.hana.login.common.config.oauth2.PrincipalOauth2UserService
 import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
@@ -42,18 +44,14 @@ class SecurityConfig(
 
             //oauth2 로그인
             .oauth2Login { o ->
-//                o.loginPage("http://localhost:3000/login") // 권한 없을시
+                o.loginPage("http://localhost:3000/login") // 권한 없을시
                     o.userInfoEndpoint { userInfoEndpoint ->
-//                        userInfoEndpoint.userService(principalOauth2UserService)
-//                        userInfoEndpoint.userService(Oauth)
+                        userInfoEndpoint.userService(principalOauth2UserService)
                     }
                     .successHandler { _, response, authentication ->
                         val principal: CustomUserDetails = authentication.principal as CustomUserDetails
                         val jwtToken = jwtUtils.generateToken(response, principal.name, principal.getMemberName())
                         response.sendRedirect("http://localhost:3000/login?token=$jwtToken")
-                    }
-                    .failureHandler() { _, response, authentication ->
-                        println("실패")
                     }
             }
 
@@ -63,5 +61,9 @@ class SecurityConfig(
             )
 
             .build()
+    }
+    @Bean
+    fun webSecurityCustomizer(): WebSecurityCustomizer {
+        return WebSecurityCustomizer { it.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations().toString(), "/favicon.ico") }
     }
 }

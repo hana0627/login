@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("test")
 class TestConfig @Autowired constructor(
-    private val tokenRepository: TokenRepository
+    private val tokenRepository: TokenRepository,
 )
 {
 
