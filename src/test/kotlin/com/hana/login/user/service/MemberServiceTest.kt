@@ -6,6 +6,7 @@ import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.repository.MemberCacheRepository
 import com.hana.login.user.repository.MemberRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +22,7 @@ import org.springframework.test.context.TestPropertySource
 @TestPropertySource("classpath:test-application.properties")
 class MemberServiceTest @Autowired constructor(
     private val memberRepository: MemberRepository,
+    private val memberCacheRepository: MemberCacheRepository,
     private val memberService: MemberService,
     private val passwordEncoder: BCryptPasswordEncoder,
 ) {
@@ -29,6 +31,7 @@ class MemberServiceTest @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         memberRepository.deleteAll();
+        memberCacheRepository.flushAll()
     }
 
     @Test

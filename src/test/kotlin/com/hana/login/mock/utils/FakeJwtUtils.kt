@@ -6,6 +6,8 @@ import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.common.repositroy.impl.TokenQueryRepository
 import com.hana.login.common.utils.JwtUtils
+import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.repository.MemberCacheRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -23,6 +25,7 @@ import java.util.*
 class FakeJwtUtils @Autowired constructor(
     private val tokenRepository: TokenRepository,
     private val tokenQueryRepository: TokenQueryRepository,
+    private val memberCacheRepository: MemberCacheRepository,
 ) : JwtUtils{
 
 
@@ -33,7 +36,7 @@ class FakeJwtUtils @Autowired constructor(
     private val refreshMs: Long = 5000
 
 
-    override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String): String {
+    override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String, password: String): String {
 
         if (secretKey == null || expiredMs == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
@@ -43,7 +46,7 @@ class FakeJwtUtils @Autowired constructor(
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, memberId, memberName, expiredMs)
+        return createToken(secretKey, memberId, memberName, password, expiredMs)
 
 //        return "Bearer tokenHeader.tokenPayload.tokenSignature"
     }
@@ -73,12 +76,20 @@ class FakeJwtUtils @Autowired constructor(
             throw throw ApplicationException(ErrorCode.TOKEN_NOT_FOUND,"accessToken 혹은 refreshToken이 존재하지 않습니다.")
         }
 
+
+
+        val memberEntity: MemberEntity? = memberCacheRepository.getMember(getMemberId(accessToken))
+        // TOD 정상동작 확인
+        if(memberEntity == null) {
+            throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
+        }
+
         // token 검증 - start
         tokenValidate(refreshToken, accessToken)
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), expiredMs).replace("Bearer ","Bearer new")
+        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.password, expiredMs).replace("Bearer ","Bearer new")
 
         return newToken
     }
@@ -166,6 +177,7 @@ class FakeJwtUtils @Autowired constructor(
         secretKey: String,
         memberId: String,
         memberName: String,
+        password: String,
         expiredMs: Long
     ): String {
 
@@ -174,6 +186,9 @@ class FakeJwtUtils @Autowired constructor(
         claims.put("memberName", memberName)
 
         val token: String = "Bearer " + secretKey + memberId + memberName + expiredMs
+
+        memberCacheRepository.setMember(MemberEntity.fixture(memberId = memberId, memberName = memberName, password= password))
+
         return token
     }
 

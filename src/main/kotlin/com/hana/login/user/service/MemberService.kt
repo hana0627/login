@@ -6,6 +6,7 @@ import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.repository.MemberCacheRepository
 import com.hana.login.user.repository.MemberRepository
 import lombok.RequiredArgsConstructor
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -15,10 +16,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @RequiredArgsConstructor
 class MemberService(
+    private val memberCacheRepository: MemberCacheRepository,
     private val memberRepository: MemberRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
 ) {
-
 
     @Transactional
     fun join(dto: MemberCreate): Long {
@@ -38,9 +39,9 @@ class MemberService(
 
 
     fun login(dto: MemberLogin): MemberEntity {
-        val member: MemberEntity = memberRepository.findByMemberId(dto.memberId)
-            ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
 
+        val member:MemberEntity = memberCacheRepository.getMember(dto.memberId) ?:
+            getMemberByMemberIdOrException(dto.memberId)
         if (!passwordEncoder.matches(dto.password, member.password)) {
             throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
         }
@@ -53,5 +54,11 @@ class MemberService(
             throw ApplicationException(ErrorCode.DUPLICATED_MEMBER_ID, "이미 가입된 회원입니다.")
         }
         return true;
+    }
+
+
+    private fun getMemberByMemberIdOrException(memberId: String): MemberEntity {
+        return memberRepository.findByMemberId(memberId)
+            ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
     }
 }

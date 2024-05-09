@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletResponse
 
 
 interface JwtUtils {
-    fun generateToken(response: HttpServletResponse, memberId: String, memberName: String,): String
+    fun generateToken(response: HttpServletResponse, memberId: String, memberName: String, password: String): String
     fun isExpired(token: String): Boolean
     fun getMemberId(token: String): String
     fun isInValidated(token: String): Boolean

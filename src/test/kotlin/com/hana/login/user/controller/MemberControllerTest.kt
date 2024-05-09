@@ -8,6 +8,7 @@ import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
 import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.repository.MemberCacheRepository
 import com.hana.login.user.repository.MemberRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -35,6 +36,7 @@ class MemberControllerTest @Autowired constructor(
     private val mvc: MockMvc,
     private val passwordEncoder: BCryptPasswordEncoder,
     private val memberRepository: MemberRepository,
+    private val memberCacheRepository: MemberCacheRepository,
     private val tokenRepository: TokenRepository,
 
     ) {
@@ -48,6 +50,7 @@ class MemberControllerTest @Autowired constructor(
     @BeforeEach
     fun beforeEach() {
         memberRepository.deleteAll()
+        memberCacheRepository.flushAll()
         tokenRepository.deleteAll()
     }
 

@@ -50,7 +50,7 @@ class SecurityConfig(
                     }
                     .successHandler { _, response, authentication ->
                         val principal: CustomUserDetails = authentication.principal as CustomUserDetails
-                        val jwtToken = jwtUtils.generateToken(response, principal.name, principal.getMemberName())
+                        val jwtToken = jwtUtils.generateToken(response, principal.name, principal.getMemberName(), principal.password)
                         response.sendRedirect("http://localhost:3000/login?token=$jwtToken")
                     }
             }

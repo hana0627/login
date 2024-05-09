@@ -42,7 +42,8 @@ class MemberController (
         val result =  jwtUtils.generateToken(
             response = response,
             memberId = member.memberId,
-            memberName = member.memberName
+            memberName = member.memberName,
+            password = member.password
         )
 
         return ResponseEntity.ok(result)

@@ -6,6 +6,8 @@ import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.common.repositroy.impl.TokenQueryRepository
 import com.hana.login.common.utils.JwtUtils
+import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.repository.MemberCacheRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -29,6 +31,7 @@ import javax.crypto.spec.SecretKeySpec
 class JwtUtilsImpl(
     private val tokenRepository: TokenRepository,
     private val tokenQueryRepository: TokenQueryRepository,
+    private val memberCacheRepository: MemberCacheRepository,
 ) : JwtUtils {
     @Value("\${jwt.secret-key}")
     private val secretKey: String? = null
@@ -48,6 +51,7 @@ class JwtUtilsImpl(
         response: HttpServletResponse,
         memberId: String,
         memberName: String,
+        password: String
     ): String {
         if (secretKey == null || expiredMs == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "SecretKey 혹은 expiredMs가 존재하지 않습니다.")
@@ -57,7 +61,7 @@ class JwtUtilsImpl(
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, memberId, memberName, expiredMs)
+        return createToken(secretKey, memberId, memberName, password, expiredMs)
     }
 
 
@@ -116,12 +120,20 @@ class JwtUtilsImpl(
             throw ApplicationException(ErrorCode.TOKEN_NOT_FOUND, "refreshToken이 존재하지 않습니다.")
         }
 
+
+        val memberEntity: MemberEntity? = memberCacheRepository.getMember(getMemberId(accessToken))
+        // TOD 정상동작 확인
+        if(memberEntity == null) {
+            throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
+        }
+        
+        
         // token 검증 - start
         tokenValidate(refreshToken, accessToken)
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), expiredMs)
+        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.password, expiredMs)
 
         val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
         val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
@@ -244,6 +256,7 @@ class JwtUtilsImpl(
         secretKey: String,
         memberId: String,
         memberName: String,
+        password: String,
         expiredMs: Long
     ): String {
 
@@ -257,6 +270,14 @@ class JwtUtilsImpl(
             .setExpiration(Date(System.currentTimeMillis() + expiredMs * 1000))
             .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
             .compact()
+
+
+        
+        
+        memberCacheRepository.setMember(
+            MemberEntity.fixture(memberId= memberId, memberName = memberName, password= password)
+        )
+
         return token
     }
 

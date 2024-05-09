@@ -5,6 +5,7 @@ import com.hana.login.common.domain.Token
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.repository.MemberCacheRepository
 import com.hana.login.user.repository.MemberRepository
 import jakarta.servlet.http.Cookie
 import org.junit.jupiter.api.Test
@@ -29,6 +30,7 @@ class TokenControllerTest @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val mvc: MockMvc,
     private val memberRepository: MemberRepository,
+    private val memberCacheRepository: MemberCacheRepository,
     private val tokenRepository: TokenRepository,
     private val passwordEncoder: BCryptPasswordEncoder,
 
@@ -46,6 +48,7 @@ class TokenControllerTest @Autowired constructor(
             password = passwordEncoder.encode("password"),
         )
         memberRepository.save(member)
+        memberCacheRepository.setMember(member)
         tokenRepository.save(Token.fixture(memberId = member.memberId, refreshToken = "Refresh$secretKey${member.memberId}$refreshMs"))
 
         //when & then
