@@ -5,7 +5,7 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-class Token (
+data class Token (
     @Column(length = 50, updatable = false)
     @Id
     val memberId: String,

@@ -4,6 +4,7 @@ import com.hana.login.common.domain.Token
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
+import com.hana.login.common.repositroy.impl.TokenQueryRepository
 import com.hana.login.common.utils.JwtUtils
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -17,7 +18,6 @@ import org.springframework.boot.web.server.Cookie
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.*
@@ -28,6 +28,7 @@ import javax.crypto.spec.SecretKeySpec
 @RequiredArgsConstructor
 class JwtUtilsImpl(
     private val tokenRepository: TokenRepository,
+    private val tokenQueryRepository: TokenQueryRepository,
 ) : JwtUtils {
     @Value("\${jwt.secret-key}")
     private val secretKey: String? = null
@@ -49,7 +50,7 @@ class JwtUtilsImpl(
         memberName: String,
     ): String {
         if (secretKey == null || expiredMs == null) {
-            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
         // refreshToken 쿠키에 저장 - start
         val refreshCookie: ResponseCookie = createRefreshToken(memberId)
@@ -108,7 +109,7 @@ class JwtUtilsImpl(
 
     override fun reGenerateToken(response: HttpServletResponse, accessToken: String, refreshToken: String?): String {
         if (secretKey == null || expiredMs == null) {
-            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         if (refreshToken == null) {
@@ -150,13 +151,13 @@ class JwtUtilsImpl(
         // refreshToken 검증 - end
 
         // accessToken의 id와 refreshToken id가 같은지 확인
-        if(getMemberId(accessToken) != getMemberId(refreshToken)) {
+        if (getMemberId(accessToken) != getMemberId(refreshToken)) {
             log.error("inValidated is token")
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "토큰 정보가 일치하지 않습니다.")
         }
 
         // refreshToken이 DB에 저장되어 있는지 확인
-        if(tokenRepository.findById(getMemberId(refreshToken)).isEmpty) {
+        if (tokenRepository.findById(getMemberId(refreshToken)).isEmpty) {
             log.error("inValidated is refreshToken")
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다")
         }
@@ -165,7 +166,7 @@ class JwtUtilsImpl(
 
     private fun generateSignature(headerAndClaims: String): String {
         if (secretKey == null || expiredMs == null) {
-            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"key 혹은 expiredMs가 존재하지 않습니다.")
+            throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "key 혹은 expiredMs가 존재하지 않습니다.")
         }
 
         // 시크릿 키를 바이트 배열로 변환
@@ -199,6 +200,7 @@ class JwtUtilsImpl(
         val keyByte: ByteArray = key.toByteArray(StandardCharsets.UTF_8)
         return Keys.hmacShaKeyFor(keyByte)
     }
+
     private fun createRefreshToken(memberId: String): ResponseCookie {
         if (refreshMs == null || secretKey == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "secretKey 혹은 refreshMs가 존재하지 않습니다.")
@@ -207,18 +209,27 @@ class JwtUtilsImpl(
         val claims: Claims = Jwts.claims()
         claims.put("memberId", memberId)
         val expiredDate: Date = Date(Date().time + (refreshMs * 1000))
-        
+
         // refreshToken 생성
-        val refreshToken: String =  Jwts.builder()
+        val refreshToken: String = Jwts.builder()
             .setClaims(claims)
             .setExpiration(expiredDate)
             .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
             .compact()
         // 토큰 저장
-        //TODO QueryDsl
-        tokenRepository.save(Token(memberId = memberId,
+        val token = Token(
+            memberId = memberId,
             expiredAt = expiredDate,
-            refreshToken = refreshToken))
+            refreshToken = refreshToken)
+
+        val exist: Boolean = tokenRepository.existsById(memberId)
+        if (exist) {
+            //@Transactional : private Method라서 repository 레이어에 적용했음
+            tokenQueryRepository.update(token)
+        } else {
+            tokenRepository.save(token)
+        }
+
 
         // ResponseCookie 객체 생성
         return ResponseCookie.from("refresh", refreshToken)

@@ -4,6 +4,7 @@ import com.hana.login.common.domain.Token
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
+import com.hana.login.common.repositroy.impl.TokenQueryRepository
 import com.hana.login.common.utils.JwtUtils
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
@@ -20,7 +21,8 @@ import java.util.*
 
 @SpringBootTest
 class FakeJwtUtils @Autowired constructor(
-    private val tokenRepository: TokenRepository
+    private val tokenRepository: TokenRepository,
+    private val tokenQueryRepository: TokenQueryRepository,
 ) : JwtUtils{
 
 
@@ -138,12 +140,18 @@ class FakeJwtUtils @Autowired constructor(
         // refreshToken 생성
         val refreshToken: String =   "Refresh" + secretKey + memberId  + refreshMs
         // 토큰 저장
-        //TODO QueryDsl
-        tokenRepository.save(
-            Token(memberId = memberId,
+        val token = Token(
+            memberId = memberId,
             expiredAt = expiredDate,
             refreshToken = refreshToken)
-        )
+
+        val exist: Boolean = tokenRepository.existsById(memberId)
+        if (exist) {
+            //@Transactional : private Method라서 repository 레이어에 적용했음
+            tokenQueryRepository.update(token)
+        } else {
+            tokenRepository.save(token)
+        }
 
         // ResponseCookie 객체 생성
         return ResponseCookie.from("refresh", refreshToken)
