@@ -19,7 +19,7 @@ async function checkToken() {
             }
         }
     } catch (error) {
-        console.error('알 수 없는 에러발생')
+        localStorage.removeItem("accessToken")
     }
 }
 
