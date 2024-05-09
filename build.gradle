@@ -55,6 +55,10 @@ dependencies {
     kapt("jakarta.persistence:jakarta.persistence-api")
     // queryDSSL - 추가
 
+    // redis - LocalDateTime
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
 }
 
 tasks.withType(KotlinCompile) {

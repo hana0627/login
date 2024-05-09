@@ -1,5 +1,6 @@
 package com.hana.login.common.domain
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass
@@ -16,16 +17,20 @@ import java.time.LocalDateTime
 abstract class AuditingFields(
     @CreatedDate
     @Column(updatable = false)
+    @JsonIgnore
     var createdAt: LocalDateTime? = null, // 생성일시
 
     @CreatedBy
     @Column(updatable = false)
+    @JsonIgnore
     var createdBy: String? = null, // 생성자
 
     @LastModifiedDate
+    @JsonIgnore
     var modifiedAt: LocalDateTime? = null, // 수정일시
 
     @LastModifiedBy
+    @JsonIgnore
     var modifiedBy: String? = null, // 수정자
 ) {
 
