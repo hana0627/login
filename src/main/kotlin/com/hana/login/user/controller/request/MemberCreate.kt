@@ -12,7 +12,7 @@ data class MemberCreate(
 
     companion object {
         fun fixture(
-            memberId: String = "hanana9506",
+            memberId: String = "hanana0627",
             memberName: String = "박하나",
             password: String = "password", // TODO 암호화
             phoneNumber: String = "01012345678",

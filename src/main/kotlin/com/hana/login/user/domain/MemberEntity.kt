@@ -26,7 +26,7 @@ data class MemberEntity(
 
     companion object {
         fun fixture(
-           memberId: String = "hanana9506",
+           memberId: String = "hanana0627",
            memberName: String = "박하나",
            password: String = "password",
            phoneNumber: String = "01012345678",

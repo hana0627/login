@@ -16,7 +16,7 @@ data class Token (
 ){
     companion object{
         fun fixture(
-            memberId: String = "hanana9506",
+            memberId: String = "hanana0627",
             expiredAt: Date = Date(),
             refreshToken: String = "refreshToken"
         ) : Token {

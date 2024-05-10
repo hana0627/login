@@ -1,4 +1,4 @@
-package com.hana.sns.common.config
+package com.hana.login.common.config
 
 import java.time.Duration
 

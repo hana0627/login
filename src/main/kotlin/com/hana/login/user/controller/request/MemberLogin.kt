@@ -6,7 +6,7 @@ data class MemberLogin(
 ) {
     companion object {
         fun fixture(
-            memberId: String = "hanana9506",
+            memberId: String = "hanana0627",
             password: String = "password",
         ) : MemberLogin {
             return MemberLogin(

@@ -1,7 +1,7 @@
 package com.hana.login.user.repository
 
 import com.hana.login.user.domain.MemberEntity
-import com.hana.sns.common.config.MEMBER_CACHE_TTL
+import com.hana.login.common.config.MEMBER_CACHE_TTL
 import lombok.RequiredArgsConstructor
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisCallback
@@ -22,8 +22,8 @@ class MemberCacheRepository(
         redisTemplate.opsForValue().set(key, member, MEMBER_CACHE_TTL)
     }
 
-    fun getMember(memberName: String): MemberEntity? {
-        val key = "Member:$memberName"
+    fun getMember(memberId: String): MemberEntity? {
+        val key = "Member:$memberId"
         val member = redisTemplate.opsForValue().get(key)
         log.info("Get Member from Redis {} , {}", key, member);
         return member
