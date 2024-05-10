@@ -1,25 +1,24 @@
 package com.hana.login.common.domain
 
-import jakarta.persistence.*
+import org.springframework.data.annotation.Id
+import org.springframework.data.redis.core.RedisHash
 import java.util.*
 
-@Entity
-data class Token (
-    @Column(length = 50, updatable = false)
+@RedisHash(value = "Refresh")
+data class RefreshToken (
     @Id
     val userId: String,
-    @Column(updatable = false)
     val expiredAt: Date,
-    @Column(length = 200, updatable = false)
     val refreshToken: String,
 ){
+    constructor(): this("",Date(System.currentTimeMillis() + 4000 * 1000),"")
     companion object{
         fun fixture(
             userId: String = "hanana0627",
             expiredAt: Date = Date(System.currentTimeMillis() + 4000 * 1000),
             refreshToken: String = "refreshToken"
-        ) : Token {
-            return Token(
+        ) : RefreshToken {
+            return RefreshToken(
                 userId,
                 expiredAt,
                 refreshToken,

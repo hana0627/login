@@ -1,7 +1,6 @@
 package com.hana.login.mock.config
 
-import com.hana.login.common.repositroy.TokenRepository
-import com.hana.login.common.repositroy.impl.TokenQueryRepository
+import com.hana.login.common.repositroy.TokenCacheRepository
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.mock.utils.FakeJwtUtils
 import com.hana.login.user.repository.UserCacheRepository
@@ -13,14 +12,13 @@ import org.springframework.context.annotation.Profile
 @Configuration
 @Profile("test")
 class TestConfig @Autowired constructor(
-    private val tokenRepository: TokenRepository,
-    private val tokenQueryRepository: TokenQueryRepository,
+    private val tokenCacheRepository: TokenCacheRepository,
     private val userCacheRepository: UserCacheRepository,
 )
 {
 
     @Bean
     fun jwtUtils(): JwtUtils {
-        return FakeJwtUtils(tokenRepository, tokenQueryRepository, userCacheRepository)
+        return FakeJwtUtils(tokenCacheRepository, userCacheRepository)
     }
 }

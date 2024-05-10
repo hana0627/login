@@ -23,7 +23,7 @@ class UserCacheRepository(
 
     fun getUser(userId: String): UserEntity? {
         val key = "User:$userId"
-        val user = redisTemplate.opsForValue().get(key)
+        val user:UserEntity? = redisTemplate.opsForValue().get(key)
         log.info("Get User from Redis {} , {}", key, user);
         return user
     }

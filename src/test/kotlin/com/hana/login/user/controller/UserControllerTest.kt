@@ -2,10 +2,10 @@ package com.hana.login.user.controller
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.hana.login.common.domain.Token
+import com.hana.login.common.domain.RefreshToken
 import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.en.ErrorCode
-import com.hana.login.common.repositroy.TokenRepository
+import com.hana.login.common.repositroy.TokenCacheRepository
 import com.hana.login.user.controller.request.UserCreate
 import com.hana.login.user.controller.request.UserLogin
 import com.hana.login.user.domain.UserEntity
@@ -39,7 +39,7 @@ class UserControllerTest @Autowired constructor(
     private val passwordEncoder: BCryptPasswordEncoder,
     private val userRepository: UserRepository,
     private val userCacheRepository: UserCacheRepository,
-    private val tokenRepository: TokenRepository,
+    private val tokenCacheRepository: TokenCacheRepository,
 
     ) {
 
@@ -53,7 +53,6 @@ class UserControllerTest @Autowired constructor(
     fun beforeEach() {
         userRepository.deleteAll()
         userCacheRepository.flushAll()
-        tokenRepository.deleteAll()
     }
 
 
@@ -267,13 +266,12 @@ class UserControllerTest @Autowired constructor(
 
         userRepository.save(entity)
 
-        tokenRepository.save(Token.fixture(
+        tokenCacheRepository.setToken(RefreshToken.fixture(
             userId = entity.userId,
             expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
             refreshToken = "refreshToken"))
 
-        val before: Long = tokenRepository.count()
-
+        val before: Boolean = tokenCacheRepository.getToken(entity.userId) != null
 
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
@@ -284,8 +282,9 @@ class UserControllerTest @Autowired constructor(
             .andDo(print())
 
         //then
-        val after: Long = tokenRepository.count()
-        assertThat(after+1).isEqualTo(before)
+        val after: Boolean = tokenCacheRepository.getToken(entity.userId) == null
+        assertThat(before).isEqualTo(true)
+        assertThat(after).isEqualTo(true)
     }
 
     @Test
@@ -299,7 +298,7 @@ class UserControllerTest @Autowired constructor(
 
         userRepository.save(entity)
 
-        tokenRepository.save(Token.fixture(
+        tokenCacheRepository.setToken(RefreshToken.fixture(
             userId = entity.userId,
             expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
             refreshToken = "refreshToken"))

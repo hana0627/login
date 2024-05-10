@@ -1,10 +1,9 @@
 package com.hana.login.mock.utils
 
-import com.hana.login.common.domain.Token
+import com.hana.login.common.domain.RefreshToken
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
-import com.hana.login.common.repositroy.TokenRepository
-import com.hana.login.common.repositroy.impl.TokenQueryRepository
+import com.hana.login.common.repositroy.TokenCacheRepository
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.domain.UserEntity
 import com.hana.login.user.repository.UserCacheRepository
@@ -23,8 +22,7 @@ import java.util.*
 
 @SpringBootTest
 class FakeJwtUtils @Autowired constructor(
-    private val tokenRepository: TokenRepository,
-    private val tokenQueryRepository: TokenQueryRepository,
+    private val tokenCacheRepository: TokenCacheRepository,
     private val userCacheRepository: UserCacheRepository,
 ) : JwtUtils{
 
@@ -95,7 +93,7 @@ class FakeJwtUtils @Autowired constructor(
     }
 
     override fun logout(userId: String): Boolean {
-        tokenRepository.deleteById(userId)
+        tokenCacheRepository.deleteToken(userId)
         return true
     }
 
@@ -119,7 +117,8 @@ class FakeJwtUtils @Autowired constructor(
         }
 
         // refreshToken이 DB에 저장되어 있는지 확인
-        if(tokenRepository.findById(getUserId(refreshToken)).isEmpty) {
+//        if(tokenRepository.findById(getUserId(refreshToken)).isEmpty) {
+        if(tokenCacheRepository.getToken(getUserId(refreshToken)) == null) {
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다")
         }
     }
@@ -156,18 +155,12 @@ class FakeJwtUtils @Autowired constructor(
         // refreshToken 생성
         val refreshToken: String =   "Refresh" + secretKey + userId  + refreshMs
         // 토큰 저장
-        val token = Token(
+        val token = RefreshToken(
             userId = userId,
             expiredAt = expiredDate,
             refreshToken = refreshToken)
 
-        val exist: Boolean = tokenRepository.existsById(userId)
-        if (exist) {
-            //@Transactional : private Method라서 repository 레이어에 적용했음
-            tokenQueryRepository.update(token)
-        } else {
-            tokenRepository.save(token)
-        }
+        tokenCacheRepository.setToken(token)
 
         // ResponseCookie 객체 생성
         return ResponseCookie.from("refresh", refreshToken)
