@@ -62,8 +62,8 @@ class UserControllerTest @Autowired constructor(
     @Test
     fun 아이디중복_검증시_중복된아이디가_없으면_true를_반환한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(userId = "hanana0627")
-        userRepository.save(entity)
+        val user: UserEntity = UserEntity.fixture(userId = "hanana0627")
+        userRepository.save(user)
 
 
         //when & then
@@ -77,8 +77,8 @@ class UserControllerTest @Autowired constructor(
     @Test
     fun 아이디중복_검증시_중복된아이디라면_예외를_발생한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(userId = "hanana0627")
-        userRepository.save(entity)
+        val user: UserEntity = UserEntity.fixture(userId = "hanana0627")
+        userRepository.save(user)
 
         //when & then
         mvc.perform(get("/api/v1/duplicate/{userId}", "hanana0627"))
@@ -218,13 +218,13 @@ class UserControllerTest @Autowired constructor(
     @Test
     fun 로그인이_성공하고_유효한_요청을_보내면_유저의_이름_및_전화번호를_반환한다_redis_캐시_없는경우도_성공() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana0627",
             userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        userRepository.save(entity)
+        userRepository.save(user)
 
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
@@ -239,13 +239,13 @@ class UserControllerTest @Autowired constructor(
     @Test
     fun 로그인이_성공하고_유효한_요청을_보내면_유저의_이름_및_전화번호를_반환한다_redis_캐시_사용하는_경우() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana0627",
             userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        userCacheRepository.setUser(entity)
+        userCacheRepository.setUser(user)
 
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
@@ -261,20 +261,20 @@ class UserControllerTest @Autowired constructor(
     @Test
     fun token_정보가_있으면_로그아웃이_성공적으로_이루어진다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana0627",
             userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        userRepository.save(entity)
+        userRepository.save(user)
 
         tokenCacheRepository.setToken(RefreshToken.fixture(
-            userId = entity.userId,
+            userId = user.userId,
             expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
             refreshToken = "refreshToken"))
 
-        val before: Boolean = tokenCacheRepository.getToken(entity.userId) != null
+        val before: Boolean = tokenCacheRepository.getToken(user.userId) != null
 
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
@@ -285,7 +285,7 @@ class UserControllerTest @Autowired constructor(
             .andDo(print())
 
         //then
-        val after: Boolean = tokenCacheRepository.getToken(entity.userId) == null
+        val after: Boolean = tokenCacheRepository.getToken(user.userId) == null
         assertThat(before).isEqualTo(true)
         assertThat(after).isEqualTo(true)
     }
@@ -293,16 +293,16 @@ class UserControllerTest @Autowired constructor(
     @Test
     fun token_정보가_없으면_로그아웃시_예외가_발생한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana0627",
             userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        userRepository.save(entity)
+        userRepository.save(user)
 
         tokenCacheRepository.setToken(RefreshToken.fixture(
-            userId = entity.userId,
+            userId = user.userId,
             expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
             refreshToken = "refreshToken"))
 

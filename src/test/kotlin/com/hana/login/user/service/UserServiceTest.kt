@@ -52,8 +52,8 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 중복된_아이디로_회원가입이_불가능하다() {
         //given
-        val entity: UserEntity = UserEntity.fixture()
-        userRepository.save(entity)
+        val user: UserEntity = UserEntity.fixture()
+        userRepository.save(user)
         val dto: UserCreate = UserCreate.fixture();
 
         //when & then
@@ -66,14 +66,14 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 올바른_정보_입력시_로그인이_성공하고_회원정보를_반환한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId = "hanana0627",
             userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01011112222",
             gender = Gender.F,
             )
-        userRepository.save(entity)
+        userRepository.save(user)
         val dto: UserLogin = UserLogin.fixture(
             userId = "hanana0627",
             password = "password",
@@ -94,8 +94,8 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 로그인시_아이디가_일치하지_않으면_예외를_생성한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(password = passwordEncoder.encode("password"))
-        userRepository.save(entity)
+        val user: UserEntity = UserEntity.fixture(password = passwordEncoder.encode("password"))
+        userRepository.save(user)
         val dto: UserLogin = UserLogin.fixture(userId = "wrongId")
 
         //when & then
@@ -107,8 +107,8 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 로그인시_비밀번호가_일치하지_않으면_예외를_생성한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(password = passwordEncoder.encode("password"))
-        userRepository.save(entity)
+        val user: UserEntity = UserEntity.fixture(password = passwordEncoder.encode("password"))
+        userRepository.save(user)
         val dto: UserLogin = UserLogin.fixture(password = "wrong_password")
 
         //when & then
@@ -120,10 +120,10 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 아이디_중복검증_성공시_true를_반환한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana",
             password = passwordEncoder.encode("password"))
-        userRepository.save(entity)
+        userRepository.save(user)
 
         //when
         val result = userService.duplicateUser("success_id")
@@ -134,10 +134,10 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 아이디_이미_존재하는_아이디이면_예외를_발생시킨다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana",
             password = passwordEncoder.encode("password"))
-        userRepository.save(entity)
+        userRepository.save(user)
 
         //when & then
         val result = assertThrows<ApplicationException> { userService.duplicateUser("hanana"); }
@@ -148,17 +148,17 @@ class UserServiceTest @Autowired constructor(
     @Test
     fun 로그인이_성공한_후_서비스_요청시_회원이름_및_전화번호를_반환한다() {
         //given
-        val entity: UserEntity = UserEntity.fixture(
+        val user: UserEntity = UserEntity.fixture(
             userId= "hanana0627",
             userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        userRepository.save(entity)
-        userCacheRepository.setUser(entity)
+        userRepository.save(user)
+        userCacheRepository.setUser(user)
 
         //when
-        val result: UserInformation  = userService.getUserSimpleInformation(entity.userId)
+        val result: UserInformation  = userService.getUserSimpleInformation(user.userId)
 
         //then
         assertThat(result.userId).isEqualTo("hanana0627")
