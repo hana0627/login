@@ -1,5 +1,6 @@
 package com.hana.login.common.controller
 
+import com.hana.login.common.controller.response.Response
 import com.hana.login.common.utils.JwtUtils
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -19,7 +20,7 @@ class TokenController(
     fun renewToken(request: HttpServletRequest,
                    response : HttpServletResponse,
                    @RequestHeader("Authorization") authorization: String,
-                   ): String {
+                   ): Response<String> {
 
         val cookies = request.cookies
         var refreshToken: String? = null
@@ -32,7 +33,7 @@ class TokenController(
 
         val accessToken: String = authorization.split(" ")[1].trim()
 
-        return jwtUtils.reGenerateToken(response, accessToken, refreshToken)
+        return Response.success(jwtUtils.reGenerateToken(response, accessToken, refreshToken))
     }
 
 }

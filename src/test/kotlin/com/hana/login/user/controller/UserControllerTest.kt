@@ -70,7 +70,8 @@ class UserControllerTest @Autowired constructor(
         mvc.perform(get("/api/v1/duplicate/{userId}", "hanana9999"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(APPLICATION_JSON))
-            .andExpect(content().string("true"))
+            .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+            .andExpect(jsonPath("$.result").value("true"))
             .andDo(print())
     }
 
@@ -170,7 +171,8 @@ class UserControllerTest @Autowired constructor(
         )
             .andDo(print())
             .andExpect(status().isOk)
-            .andExpect(content().string("Bearer $secretKey${user.userId}${user.userName}$expiredMs"))
+            .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+            .andExpect(jsonPath("$.result").value("Bearer $secretKey${user.userId}${user.userName}$expiredMs"))
             .andExpect(cookie().value("refresh", "Refresh$secretKey${user.userId}$refreshMs"))
 
     }
@@ -231,9 +233,9 @@ class UserControllerTest @Autowired constructor(
         //when & then
         mvc.perform(get("/api/v2/auth").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.userId").value("hanana0627"))
-            .andExpect(jsonPath("$.userName").value("박하나"))
-            .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
+            .andExpect(jsonPath("$.result.userId").value("hanana0627"))
+            .andExpect(jsonPath("$.result.userName").value("박하나"))
+            .andExpect(jsonPath("$.result.phoneNumber").value("01012345678"))
             .andDo(print())
     }
     @Test
@@ -252,9 +254,9 @@ class UserControllerTest @Autowired constructor(
         //when & then
         mvc.perform(get("/api/v2/auth").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.userId").value("hanana0627"))
-            .andExpect(jsonPath("$.userName").value("박하나"))
-            .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
+            .andExpect(jsonPath("$.result.userId").value("hanana0627"))
+            .andExpect(jsonPath("$.result.userName").value("박하나"))
+            .andExpect(jsonPath("$.result.phoneNumber").value("01012345678"))
             .andDo(print())
     }
 
@@ -281,7 +283,8 @@ class UserControllerTest @Autowired constructor(
         //when
         mvc.perform(get("/api/v2/logout").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(content().string("true"))
+            .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+            .andExpect(jsonPath("$.result").value("true"))
             .andDo(print())
 
         //then
@@ -374,7 +377,8 @@ class UserControllerTest @Autowired constructor(
         //when
         mvc.perform(get("/api/v2/logout").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(content().string("true"))
+            .andExpect(jsonPath("$.resultCode").value("SUCCESS"))
+            .andExpect(jsonPath("$.result").value("true"))
 
         //then
         val afterCount: Long = loginLogRepository.count()

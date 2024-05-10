@@ -1,5 +1,6 @@
 package com.hana.login.user.controller
 
+import com.hana.login.common.controller.response.Response
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.controller.request.UserCreate
 import com.hana.login.user.controller.request.UserLogin
@@ -24,20 +25,20 @@ class UserController (
     private val jwtUtils: JwtUtils,
 ){
     @GetMapping("/api/v1/duplicate/{userId}")
-    fun duplicateUser(@PathVariable userId: String): ResponseEntity<Boolean> {
+    fun duplicateUser(@PathVariable userId: String): Response<Boolean> {
         val result:Boolean = userService.duplicateUser(userId);
-        return ResponseEntity.ok(result)
+        return Response.success(result)
     }
 
     @PostMapping("/api/v1/join")
-    fun saveUser(@RequestBody requestDto: UserCreate): ResponseEntity<Long> {
+    fun saveUser(@RequestBody requestDto: UserCreate): Response<Long> {
         val result: Long =  userService.join(requestDto);
 
-        return ResponseEntity.ok(result)
+        return Response.success(result)
     }
 
     @PostMapping("/api/v1/login")
-    fun login(@RequestBody requestDto: UserLogin, request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
+    fun login(@RequestBody requestDto: UserLogin, request: HttpServletRequest, response: HttpServletResponse): Response<String> {
 
         val user: UserEntity = userService.login(requestDto)
 
@@ -50,25 +51,24 @@ class UserController (
             phoneNumber = user.phoneNumber,
             password = user.password
         )
-
-        return ResponseEntity.ok(result)
+        return Response.success(result)
     }
 
     @GetMapping("/api/v2/auth")
     fun MyPage(
         authentication: Authentication
-    ): ResponseEntity<UserInformation> {
+    ): Response<UserInformation> {
         val userId: String = authentication.principal.toString()
         val result: UserInformation = userService.getUserSimpleInformation(userId)
-        return ResponseEntity.ok(result)
+        return Response.success(result)
     }
 
     @GetMapping("/api/v2/logout")
     fun logout(
         request: HttpServletRequest,
-        authentication: Authentication): ResponseEntity<Boolean> {
+        authentication: Authentication): Response<Boolean> {
         val userId: String = authentication.principal.toString()
         val result = jwtUtils.logout(request, userId)
-        return ResponseEntity.ok(result)
+        return Response.success(result)
     }
 }
