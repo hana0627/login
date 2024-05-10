@@ -20,6 +20,7 @@ import org.springframework.boot.web.server.Cookie
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.nio.charset.StandardCharsets
 import java.security.Key
 import java.util.*
@@ -146,6 +147,12 @@ class JwtUtilsImpl(
         }
 
         return newToken
+    }
+
+    @Transactional
+    override fun logout(userId: String): Boolean {
+        tokenRepository.deleteById(userId)
+        return true
     }
 
     private fun tokenValidate(

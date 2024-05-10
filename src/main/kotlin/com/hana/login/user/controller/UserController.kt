@@ -60,4 +60,11 @@ class UserController (
         val result: UserInformation = userService.getUserSimpleInformation(userId)
         return ResponseEntity.ok(result)
     }
+
+    @GetMapping("/api/v2/logout")
+    fun logout(authentication: Authentication): ResponseEntity<Boolean> {
+        val userId: String = authentication.principal.toString()
+        val result = jwtUtils.logout(userId)
+        return ResponseEntity.ok(result)
+    }
 }

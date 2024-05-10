@@ -9,5 +9,6 @@ interface JwtUtils {
     fun getUserId(token: String): String
     fun isInValidated(token: String): Boolean
     fun reGenerateToken(response: HttpServletResponse, accessToken: String, refreshToken: String?): String
+    fun logout(userId: String): Boolean
 
 }

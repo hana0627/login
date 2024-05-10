@@ -94,6 +94,11 @@ class FakeJwtUtils @Autowired constructor(
         return newToken
     }
 
+    override fun logout(userId: String): Boolean {
+        tokenRepository.deleteById(userId)
+        return true
+    }
+
 
     private fun tokenValidate(
         refreshToken: String,

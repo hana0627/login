@@ -2,6 +2,7 @@ package com.hana.login.user.controller
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.hana.login.common.domain.Token
 import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
@@ -26,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest
@@ -252,6 +254,62 @@ class UserControllerTest @Autowired constructor(
             .andExpect(jsonPath("$.userName").value("박하나"))
             .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
             .andDo(print())
+    }
+
+    @Test
+    fun token_정보가_있으면_로그아웃이_성공적으로_이루어진다() {
+        //given
+        val entity: UserEntity = UserEntity.fixture(
+            userId= "hanana0627",
+            userName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01012345678")
+
+        userRepository.save(entity)
+
+        tokenRepository.save(Token.fixture(
+            userId = entity.userId,
+            expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
+            refreshToken = "refreshToken"))
+
+        val before: Long = tokenRepository.count()
+
+
+        val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
+
+        //when
+        mvc.perform(get("/api/v2/logout").header("AUTHORIZATION", token))
+            .andExpect(status().isOk)
+            .andExpect(content().string("true"))
+            .andDo(print())
+
+        //then
+        val after: Long = tokenRepository.count()
+        assertThat(after+1).isEqualTo(before)
+    }
+
+    @Test
+    fun token_정보가_없으면_로그아웃시_예외가_발생한다() {
+        //given
+        val entity: UserEntity = UserEntity.fixture(
+            userId= "hanana0627",
+            userName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01012345678")
+
+        userRepository.save(entity)
+
+        tokenRepository.save(Token.fixture(
+            userId = entity.userId,
+            expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
+            refreshToken = "refreshToken"))
+
+        //when then
+        mvc.perform(get("/api/v2/logout"))
+            .andExpect(status().isUnauthorized)
+            .andExpect(status().reason("jwt 토큰 정보가 없습니다"))
+            .andDo(print())
+
     }
 
 }
