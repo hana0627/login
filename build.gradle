@@ -7,6 +7,8 @@ plugins {
     id "org.jetbrains.kotlin.kapt" version "1.9.23"
     id 'org.jetbrains.kotlin.plugin.spring' version '1.9.23'
     id 'org.jetbrains.kotlin.plugin.jpa' version '1.9.23'
+
+    id "org.asciidoctor.jvm.convert" version "3.3.2"  // restDocs
 }
 
 group = 'com.hana'
@@ -17,6 +19,8 @@ java {
 }
 
 configurations {
+    asciidoctorExt // restDocs
+
     compileOnly {
         extendsFrom annotationProcessor
     }
@@ -59,6 +63,14 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
+    // restDocs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets') // restDocs
 }
 
 tasks.withType(KotlinCompile) {
@@ -70,7 +82,31 @@ tasks.withType(KotlinCompile) {
 
 tasks.named('test') {
     useJUnitPlatform()
+    outputs.dir snippetsDir // restDocs
 }
+
+
+asciidoctor {
+    configurations 'asciidoctorExt' // restDocs
+    baseDirFollowsSourceFile() // restDocs
+    inputs.dir snippetsDir // restDocs
+    dependsOn test // restDocs
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')  // restDocs
+}
+
+task copyDocument(type: Copy) { // restDocs
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument // restDocs
+}
+
 
 // Querydsl 설정부 추가 - start
 def generated = file("src/main/generated")
