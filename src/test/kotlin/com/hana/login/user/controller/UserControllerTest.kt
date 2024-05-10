@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.hana.login.common.domain.RefreshToken
 import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.en.ErrorCode
+import com.hana.login.common.repositroy.LoginLogRepository
 import com.hana.login.common.repositroy.TokenCacheRepository
 import com.hana.login.user.controller.request.UserCreate
 import com.hana.login.user.controller.request.UserLogin
@@ -40,6 +41,7 @@ class UserControllerTest @Autowired constructor(
     private val userRepository: UserRepository,
     private val userCacheRepository: UserCacheRepository,
     private val tokenCacheRepository: TokenCacheRepository,
+    private val loginLogRepository: LoginLogRepository,
 
     ) {
 
@@ -53,6 +55,7 @@ class UserControllerTest @Autowired constructor(
     fun beforeEach() {
         userRepository.deleteAll()
         userCacheRepository.flushAll()
+        loginLogRepository.deleteAll()
     }
 
 
@@ -311,4 +314,77 @@ class UserControllerTest @Autowired constructor(
 
     }
 
+
+    @Test
+    fun 로그인_성공시_loginLog에_정보가_쌓인다() {
+        //given
+        val user: UserEntity = UserEntity.fixture(
+            userId = "hanana0627",
+            password = passwordEncoder.encode("password"),
+        )
+        userCacheRepository.setUser(user)
+
+        val userLogin: UserLogin = UserLogin.fixture(
+            userId = "hanana0627",
+            password = "password",
+        )
+        val json: String = objectMapper.writeValueAsString(userLogin)
+
+        val beforeCount: Long = loginLogRepository.count()
+
+
+        //when
+        mvc.perform(
+            post("/api/v1/login")
+                .contentType(APPLICATION_JSON)
+                .content(json))
+
+        //then
+        val afterCount: Long = loginLogRepository.count()
+        val result = loginLogRepository.findAll().get((afterCount-1).toInt())
+
+        assertThat(beforeCount+1).isEqualTo(afterCount)
+        assertThat(result.userId).isEqualTo(user.userId)
+        assertThat(result.loginType).isEqualTo("LOGIN")
+        assertThat(result.userIp).isEqualTo("127.0.0.1")
+        //assertThat(result.timeStamp)....???.isBefore(now)???
+    }
+
+    @Test
+    fun 로그아웃시_loginLog에_정보가_쌓인다() {
+        //given
+        val user: UserEntity = UserEntity.fixture(
+            userId= "hanana0627",
+            userName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01012345678")
+
+        userCacheRepository.setUser(user)
+
+        tokenCacheRepository.setToken(RefreshToken.fixture(
+            userId = user.userId,
+            expiredAt = Date(System.currentTimeMillis() + 4000 * 1000),
+            refreshToken = "refreshToken")
+        )
+
+        val beforeCount: Long = loginLogRepository.count()
+
+        val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
+
+        //when
+        mvc.perform(get("/api/v2/logout").header("AUTHORIZATION", token))
+            .andExpect(status().isOk)
+            .andExpect(content().string("true"))
+
+        //then
+        val afterCount: Long = loginLogRepository.count()
+        val result = loginLogRepository.findAll().get((afterCount-1).toInt())
+
+        assertThat(beforeCount+1).isEqualTo(afterCount)
+        assertThat(result.userId).isEqualTo(user.userId)
+        assertThat(result.loginType).isEqualTo("LOGOUT")
+        assertThat(result.userIp).isEqualTo("127.0.0.1")
+        //assertThat(result.timeStamp)....???.isBefore(now)???
+
+    }
 }

@@ -1,8 +1,10 @@
 package com.hana.login.mock.utils
 
+import com.hana.login.common.domain.LoginLog
 import com.hana.login.common.domain.RefreshToken
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
+import com.hana.login.common.repositroy.LoginLogRepository
 import com.hana.login.common.repositroy.TokenCacheRepository
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.domain.UserEntity
@@ -10,6 +12,7 @@ import com.hana.login.user.repository.UserCacheRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -18,12 +21,14 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import java.nio.charset.StandardCharsets
 import java.security.Key
+import java.time.LocalDateTime
 import java.util.*
 
 @SpringBootTest
 class FakeJwtUtils @Autowired constructor(
     private val tokenCacheRepository: TokenCacheRepository,
     private val userCacheRepository: UserCacheRepository,
+    private val loginLogRepository: LoginLogRepository,
 ) : JwtUtils{
 
 
@@ -34,7 +39,13 @@ class FakeJwtUtils @Autowired constructor(
     private val refreshMs: Long = 5000
 
 
-    override fun generateToken(response: HttpServletResponse, userId: String, userName: String, phoneNumber: String, password: String): String {
+    override fun generateToken(request: HttpServletRequest,
+                               response: HttpServletResponse,
+                               userId: String,
+                               userName: String,
+                               phoneNumber: String,
+                               password: String
+    ): String {
 
         if (secretKey == null || expiredMs == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
@@ -44,9 +55,23 @@ class FakeJwtUtils @Autowired constructor(
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, userId, userName, phoneNumber, password, expiredMs)
+        userCacheRepository.setUser(
+            UserEntity.fixture(userId= userId, userName = userName, phoneNumber= phoneNumber, password= password)
+        )
 
-//        return "Bearer tokenHeader.tokenPayload.tokenSignature"
+        loginLogRepository.save(
+            LoginLog.fixture(
+                userId = userId,
+                timeStamp = LocalDateTime.now(),
+                loginType = "LOGIN",
+                userIp = request.remoteAddr,
+                id = null,
+            )
+        )
+
+
+
+        return createToken(secretKey, userId, userName, expiredMs)
     }
 
     override fun isExpired(token: String): Boolean {
@@ -74,26 +99,36 @@ class FakeJwtUtils @Autowired constructor(
             throw throw ApplicationException(ErrorCode.TOKEN_NOT_FOUND,"accessToken 혹은 refreshToken이 존재하지 않습니다.")
         }
 
-
-
-        val userEntity: UserEntity? = userCacheRepository.getUser(getUserId(accessToken))
-        // TOD 정상동작 확인
-        if(userEntity == null) {
-            throw ApplicationException(ErrorCode.USER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
-        }
-
         // token 검증 - start
         tokenValidate(refreshToken, accessToken)
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken), userEntity.phoneNumber, userEntity.password, expiredMs).replace("Bearer ","Bearer new")
+        val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken),  expiredMs)
 
+        val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
+        val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
+
+        // newAccessToken의 만료시간이 refreshToken의 만료시간보다 길면 refreshToken 갱신
+        if (newTokenExpired > refreshTokenExpired) {
+            val refreshCookie: ResponseCookie = createRefreshToken(getUserId(accessToken))
+            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+        }
         return newToken
     }
 
-    override fun logout(userId: String): Boolean {
+    override fun logout(request: HttpServletRequest, userId: String): Boolean {
         tokenCacheRepository.deleteToken(userId)
+
+        loginLogRepository.save(
+            LoginLog.fixture(
+                userId = userId,
+                timeStamp = LocalDateTime.now(),
+                loginType = "LOGOUT",
+                userIp = request.remoteAddr,
+                id = null,
+            )
+        )
         return true
     }
 
@@ -175,8 +210,6 @@ class FakeJwtUtils @Autowired constructor(
         secretKey: String,
         userId: String,
         userName: String,
-        phoneNumber: String,
-        password: String,
         expiredMs: Long
     ): String {
 
@@ -185,8 +218,6 @@ class FakeJwtUtils @Autowired constructor(
         claims.put("userName", userName)
 
         val token: String = "Bearer " + secretKey + userId + userName + expiredMs
-
-        userCacheRepository.setUser(UserEntity.fixture(userId = userId, userName = userName, phoneNumber=phoneNumber, password= password))
 
         return token
     }

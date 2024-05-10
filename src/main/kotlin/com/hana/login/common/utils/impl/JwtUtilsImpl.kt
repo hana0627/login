@@ -1,8 +1,10 @@
 package com.hana.login.common.utils.impl
 
+import com.hana.login.common.domain.LoginLog
 import com.hana.login.common.domain.RefreshToken
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
+import com.hana.login.common.repositroy.LoginLogRepository
 import com.hana.login.common.repositroy.TokenCacheRepository
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.domain.UserEntity
@@ -11,6 +13,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
 import org.slf4j.LoggerFactory
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import java.nio.charset.StandardCharsets
 import java.security.Key
+import java.time.LocalDateTime
 import java.util.*
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
@@ -31,6 +35,7 @@ import javax.crypto.spec.SecretKeySpec
 class JwtUtilsImpl(
     private val tokenCacheRepository: TokenCacheRepository,
     private val userCacheRepository: UserCacheRepository,
+    private val loginLogRepository: LoginLogRepository,
 ) : JwtUtils {
     @Value("\${jwt.secret-key}")
     private val secretKey: String? = null
@@ -47,6 +52,7 @@ class JwtUtilsImpl(
      * 토큰생성
      */
     override fun generateToken(
+        request: HttpServletRequest,
         response: HttpServletResponse,
         userId: String,
         userName: String,
@@ -64,6 +70,17 @@ class JwtUtilsImpl(
         userCacheRepository.setUser(
             UserEntity.fixture(userId= userId, userName = userName, phoneNumber= phoneNumber, password= password)
         )
+
+        loginLogRepository.save(
+            LoginLog.fixture(
+                userId = userId,
+                timeStamp = LocalDateTime.now(),
+                loginType = "LOGIN",
+                userIp = request.remoteAddr,
+                id = null,
+            )
+        )
+
 
         return createToken(secretKey, userId, userName, expiredMs)
     }
@@ -143,8 +160,18 @@ class JwtUtilsImpl(
     }
 
     @Transactional
-    override fun logout(userId: String): Boolean {
+    override fun logout(request: HttpServletRequest, userId: String): Boolean {
         tokenCacheRepository.deleteToken(userId)
+
+        loginLogRepository.save(
+            LoginLog.fixture(
+                userId = userId,
+                timeStamp = LocalDateTime.now(),
+                loginType = "LOGOUT",
+                userIp = request.remoteAddr,
+                id = null,
+            )
+        )
         return true
     }
 

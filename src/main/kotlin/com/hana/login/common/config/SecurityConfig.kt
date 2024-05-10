@@ -48,9 +48,9 @@ class SecurityConfig(
                     o.userInfoEndpoint { userInfoEndpoint ->
                         userInfoEndpoint.userService(principalOauth2UserService)
                     }
-                    .successHandler { _, response, authentication ->
+                    .successHandler { request, response, authentication ->
                         val principal: CustomUserDetails = authentication.principal as CustomUserDetails
-                        val jwtToken = jwtUtils.generateToken(response, principal.name, principal.getUserName(), principal.getPhoneNumber(), principal.password)
+                        val jwtToken = jwtUtils.generateToken(request, response, principal.name, principal.getUserName(), principal.getPhoneNumber(), principal.password)
                         response.sendRedirect("http://localhost:3000/login?token=$jwtToken")
                     }
             }

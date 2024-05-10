@@ -6,6 +6,7 @@ import com.hana.login.user.controller.request.UserLogin
 import com.hana.login.user.controller.response.UserInformation
 import com.hana.login.user.domain.UserEntity
 import com.hana.login.user.service.UserService
+import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
 import org.springframework.http.ResponseEntity
@@ -36,12 +37,13 @@ class UserController (
     }
 
     @PostMapping("/api/v1/login")
-    fun login(@RequestBody requestDto: UserLogin, response: HttpServletResponse): ResponseEntity<String> {
+    fun login(@RequestBody requestDto: UserLogin, request: HttpServletRequest, response: HttpServletResponse): ResponseEntity<String> {
 
         val user: UserEntity = userService.login(requestDto)
 
         // 토큰생성
         val result =  jwtUtils.generateToken(
+            request= request,
             response = response,
             userId = user.userId,
             userName = user.userName,
@@ -62,9 +64,11 @@ class UserController (
     }
 
     @GetMapping("/api/v2/logout")
-    fun logout(authentication: Authentication): ResponseEntity<Boolean> {
+    fun logout(
+        request: HttpServletRequest,
+        authentication: Authentication): ResponseEntity<Boolean> {
         val userId: String = authentication.principal.toString()
-        val result = jwtUtils.logout(userId)
+        val result = jwtUtils.logout(request, userId)
         return ResponseEntity.ok(result)
     }
 }
