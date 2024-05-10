@@ -134,10 +134,6 @@ class JwtUtilsImpl(
         val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
         val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
 
-        println("1111")
-        println(newTokenExpired)
-        println(refreshTokenExpired)
-        println(newTokenExpired > refreshTokenExpired)
         // newAccessToken의 만료시간이 refreshToken의 만료시간보다 길면 refreshToken 갱신
         if (newTokenExpired > refreshTokenExpired) {
             val refreshCookie: ResponseCookie = createRefreshToken(getUserId(accessToken))
