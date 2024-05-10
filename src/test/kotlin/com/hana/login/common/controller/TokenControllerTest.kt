@@ -77,8 +77,8 @@ class TokenControllerTest @Autowired constructor(
             .cookie(Cookie("something","somethingValue"))
             .header(HttpHeaders.AUTHORIZATION,"Bearer $secretKey${user.userId}${user.userName}$expiredMs"))
             .andExpect(status().isNotFound)
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.TOKEN_NOT_FOUND.toString()))
-            .andExpect(jsonPath("$.message").value("accessToken 혹은 refreshToken이 존재하지 않습니다."))
+            .andExpect(jsonPath("$.error.errorCode").value(ErrorCode.TOKEN_NOT_FOUND.toString()))
+            .andExpect(jsonPath("$.error.message").value("accessToken 혹은 refreshToken이 존재하지 않습니다."))
             .andDo(print())
     }
 

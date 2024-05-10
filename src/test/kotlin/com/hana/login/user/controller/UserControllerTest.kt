@@ -84,8 +84,8 @@ class UserControllerTest @Autowired constructor(
         //when & then
         mvc.perform(get("/api/v1/duplicate/{userId}", "hanana0627"))
             .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.resultCode").value(ErrorCode.DUPLICATED_USER_ID.toString()))
-            .andExpect(jsonPath("$.errorMessage").value("중복된 아이디 입니다."))
+            .andExpect(jsonPath("$.error.errorCode").value(ErrorCode.DUPLICATED_USER_ID.toString()))
+            .andExpect(jsonPath("$.error.message").value("이미 가입된 회원입니다."))
             .andDo(print())
     }
 
@@ -144,8 +144,8 @@ class UserControllerTest @Autowired constructor(
                 .content(json)
         )
             .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.resultCode").value(ErrorCode.DUPLICATED_USER_ID.toString()))
-            .andExpect(jsonPath("$.errorMessage").value("중복된 아이디 입니다."))
+            .andExpect(jsonPath("$.error.errorCode").value(ErrorCode.DUPLICATED_USER_ID.toString()))
+            .andExpect(jsonPath("$.error.message").value("이미 가입된 회원입니다."))
             .andDo(print())
     }
 
@@ -200,8 +200,8 @@ class UserControllerTest @Autowired constructor(
                 .content(json)
         )
             .andExpect(status().isNotFound)
-            .andExpect(jsonPath("$.resultCode").value(ErrorCode.USER_NOT_FOUNT.toString()))
-            .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 회원입니다."))
+            .andExpect(jsonPath("$.error.errorCode").value(ErrorCode.USER_NOT_FOUNT.toString()))
+            .andExpect(jsonPath("$.error.message").value("회원 정보가 없습니다."))
             .andDo(print())
     }
 

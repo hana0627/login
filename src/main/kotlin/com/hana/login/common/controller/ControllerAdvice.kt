@@ -1,6 +1,6 @@
 package com.hana.login.common.controller
 
-import com.hana.login.common.controller.response.Response
+import com.hana.login.common.controller.response.ErrorResponse
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
 import jakarta.servlet.http.HttpServletResponse
@@ -16,10 +16,14 @@ class ControllerAdvice {
     private val log = LoggerFactory.getLogger(javaClass)
 
     @ExceptionHandler(ApplicationException::class)
-    fun applicationHandler(error: ApplicationException, response: HttpServletResponse) : Response<Any> {
+    fun applicationHandler(error: ApplicationException, response: HttpServletResponse) : ErrorResponse<Any> {
         log.info("!!Error occurred!! $error")
         response.status = error.errorCode.status.value()
-        return Response.error(error.errorCode.name, error.errorCode.message)
+
+        return ErrorResponse(error)
+
+//        return Response.error(error.errorCode.name, error.errorCode.message)
+
 //        return ResponseEntity.status(error.errorCode.status)
 //            .body(error)
     }
