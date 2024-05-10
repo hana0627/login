@@ -36,7 +36,7 @@ class FakeJwtUtils @Autowired constructor(
     private val refreshMs: Long = 5000
 
 
-    override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String, password: String): String {
+    override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String, phoneNumber: String, password: String): String {
 
         if (secretKey == null || expiredMs == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
@@ -46,7 +46,7 @@ class FakeJwtUtils @Autowired constructor(
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, memberId, memberName, password, expiredMs)
+        return createToken(secretKey, memberId, memberName, phoneNumber, password, expiredMs)
 
 //        return "Bearer tokenHeader.tokenPayload.tokenSignature"
     }
@@ -89,7 +89,7 @@ class FakeJwtUtils @Autowired constructor(
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.password, expiredMs).replace("Bearer ","Bearer new")
+        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.phoneNumber, memberEntity.password, expiredMs).replace("Bearer ","Bearer new")
 
         return newToken
     }
@@ -177,6 +177,7 @@ class FakeJwtUtils @Autowired constructor(
         secretKey: String,
         memberId: String,
         memberName: String,
+        phoneNumber: String,
         password: String,
         expiredMs: Long
     ): String {
@@ -187,7 +188,7 @@ class FakeJwtUtils @Autowired constructor(
 
         val token: String = "Bearer " + secretKey + memberId + memberName + expiredMs
 
-        memberCacheRepository.setMember(MemberEntity.fixture(memberId = memberId, memberName = memberName, password= password))
+        memberCacheRepository.setMember(MemberEntity.fixture(memberId = memberId, memberName = memberName, phoneNumber=phoneNumber, password= password))
 
         return token
     }

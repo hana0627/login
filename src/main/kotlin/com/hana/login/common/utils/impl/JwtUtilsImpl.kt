@@ -51,6 +51,7 @@ class JwtUtilsImpl(
         response: HttpServletResponse,
         memberId: String,
         memberName: String,
+        phoneNumber: String,
         password: String
     ): String {
         if (secretKey == null || expiredMs == null) {
@@ -61,7 +62,7 @@ class JwtUtilsImpl(
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, memberId, memberName, password, expiredMs)
+        return createToken(secretKey, memberId, memberName,phoneNumber, password, expiredMs)
     }
 
 
@@ -133,7 +134,7 @@ class JwtUtilsImpl(
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.password, expiredMs)
+        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.phoneNumber, memberEntity.password, expiredMs)
 
         val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
         val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
@@ -256,6 +257,7 @@ class JwtUtilsImpl(
         secretKey: String,
         memberId: String,
         memberName: String,
+        phoneNumber: String,
         password: String,
         expiredMs: Long
     ): String {
@@ -275,7 +277,7 @@ class JwtUtilsImpl(
         
         
         memberCacheRepository.setMember(
-            MemberEntity.fixture(memberId= memberId, memberName = memberName, password= password)
+            MemberEntity.fixture(memberId= memberId, memberName = memberName, phoneNumber= phoneNumber, password= password)
         )
 
         return token

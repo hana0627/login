@@ -2,9 +2,9 @@ package com.hana.login.user.service
 
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
-import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
+import com.hana.login.user.controller.response.MemberInformation
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberCacheRepository
 import com.hana.login.user.repository.MemberRepository
@@ -60,5 +60,11 @@ class MemberService(
     private fun getMemberByMemberIdOrException(memberId: String): MemberEntity {
         return memberRepository.findByMemberId(memberId)
             ?: throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "회원 정보가 없습니다.")
+    }
+
+    fun getUserSimpleInformation(memberId: String): MemberInformation {
+        val member: MemberEntity = memberCacheRepository.getMember(memberId)?:
+            getMemberByMemberIdOrException(memberId)
+        return MemberInformation(memberId = member.memberId, memberName = member.memberName, phoneNumber = member.phoneNumber)
     }
 }

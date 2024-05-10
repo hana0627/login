@@ -3,11 +3,13 @@ package com.hana.login.user.controller
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
+import com.hana.login.user.controller.response.MemberInformation
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.service.MemberService
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -43,6 +45,7 @@ class MemberController (
             response = response,
             memberId = member.memberId,
             memberName = member.memberName,
+            phoneNumber = member.phoneNumber,
             password = member.password
         )
 
@@ -50,7 +53,11 @@ class MemberController (
     }
 
     @GetMapping("/api/v2/auth")
-    fun MyPage(): ResponseEntity<Any> {
-        return ResponseEntity.ok("성공!")
+    fun MyPage(
+        authentication: Authentication
+    ): ResponseEntity<MemberInformation> {
+        val memberId: String = authentication.principal.toString()
+        val result: MemberInformation = memberService.getUserSimpleInformation(memberId)
+        return ResponseEntity.ok(result)
     }
 }

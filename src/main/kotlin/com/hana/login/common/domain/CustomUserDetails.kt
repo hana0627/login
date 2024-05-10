@@ -54,4 +54,8 @@ class CustomUserDetails(
     fun getMemberName(): String {
         return memberEntity.memberName
     }
+
+    fun getPhoneNumber(): String {
+        return memberEntity.phoneNumber
+    }
 }

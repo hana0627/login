@@ -5,6 +5,7 @@ import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.user.controller.request.MemberCreate
 import com.hana.login.user.controller.request.MemberLogin
+import com.hana.login.user.controller.response.MemberInformation
 import com.hana.login.user.domain.MemberEntity
 import com.hana.login.user.repository.MemberCacheRepository
 import com.hana.login.user.repository.MemberRepository
@@ -143,6 +144,29 @@ class MemberServiceTest @Autowired constructor(
         assertThat(result.errorCode).isEqualTo(ErrorCode.DUPLICATED_MEMBER_ID)
         assertThat(result.message).isEqualTo("이미 가입된 회원입니다.")
     }
+
+    @Test
+    fun 로그인이_성공한_후_서비스_요청시_회원이름_및_전화번호를_반환한다() {
+        //given
+        val entity: MemberEntity = MemberEntity.fixture(
+            memberId= "hanana0627",
+            memberName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01012345678")
+
+        memberRepository.save(entity)
+        memberCacheRepository.setMember(entity)
+
+        //when
+        val result: MemberInformation  = memberService.getUserSimpleInformation(entity.memberId)
+
+        //then
+        assertThat(result.memberId).isEqualTo("hanana0627")
+        assertThat(result.memberName).isEqualTo("박하나")
+        assertThat(result.phoneNumber).isEqualTo("01012345678")
+    }
+
 }
+
 
 

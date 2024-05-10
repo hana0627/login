@@ -212,14 +212,45 @@ class MemberControllerTest @Autowired constructor(
     }
 
     @Test
-    fun jwt토큰이_헤더에_있으면_인증이_필요한_요청이_성공한다() {
+    fun 로그인이_성공하고_유효한_요청을_보내면_유저의_이름_및_전화번호를_반환한다_redis_캐시_없는경우도_성공() {
         //given
+        val entity: MemberEntity = MemberEntity.fixture(
+            memberId= "hanana0627",
+            memberName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01012345678")
+
+        memberRepository.save(entity)
+
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
         //when & then
         mvc.perform(get("/api/v2/auth").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(content().string("성공!"))
+            .andExpect(jsonPath("$.memberId").value("hanana0627"))
+            .andExpect(jsonPath("$.memberName").value("박하나"))
+            .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
+            .andDo(print())
+    }
+    @Test
+    fun 로그인이_성공하고_유효한_요청을_보내면_유저의_이름_및_전화번호를_반환한다_redis_캐시_사용하는_경우() {
+        //given
+        val entity: MemberEntity = MemberEntity.fixture(
+            memberId= "hanana0627",
+            memberName = "박하나",
+            password = passwordEncoder.encode("password"),
+            phoneNumber = "01012345678")
+
+        memberCacheRepository.setMember(entity)
+
+        val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
+
+        //when & then
+        mvc.perform(get("/api/v2/auth").header("AUTHORIZATION", token))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.memberId").value("hanana0627"))
+            .andExpect(jsonPath("$.memberName").value("박하나"))
+            .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
             .andDo(print())
     }
 
