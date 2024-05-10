@@ -59,9 +59,9 @@ class JwtFiler(
                 filterChain.doFilter(request, response)
             }
             // 회원 아이디 추출
-            val memberId = jwtUtils.getMemberId(token)
+            val userId = jwtUtils.getUserId(token)
 
-            val authentication = UsernamePasswordAuthenticationToken(memberId, null, mutableListOf())
+            val authentication = UsernamePasswordAuthenticationToken(userId, null, mutableListOf())
             SecurityContextHolder.getContext().authentication = authentication
 
             filterChain.doFilter(request, response)

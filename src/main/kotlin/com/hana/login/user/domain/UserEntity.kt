@@ -6,12 +6,12 @@ import jakarta.persistence.*
 
 
 @Entity
-@Table(name = "member_account")
-data class MemberEntity(
+@Table(name = "user_account")
+data class UserEntity(
     @Column(length = 100, updatable = false)
-    var memberId: String,
+    var userId: String,
     @Column(length = 50)
-    var memberName: String,
+    var userName: String,
     @Column(length = 200)
     var password: String,
     @Column(length = 50)
@@ -26,16 +26,16 @@ data class MemberEntity(
 
     companion object {
         fun fixture(
-           memberId: String = "hanana0627",
-           memberName: String = "박하나",
+           userId: String = "hanana0627",
+           userName: String = "박하나",
            password: String = "password",
            phoneNumber: String = "01012345678",
            gender: Gender = Gender.F,
            id: Long? = null
-        ) : MemberEntity {
-            return MemberEntity(
-                memberId = memberId,
-                memberName = memberName,
+        ) : UserEntity {
+            return UserEntity(
+                userId = userId,
+                userName = userName,
                 password = password,
                 phoneNumber = phoneNumber,
                 gender = gender,

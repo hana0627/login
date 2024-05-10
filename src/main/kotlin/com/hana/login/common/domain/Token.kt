@@ -1,6 +1,5 @@
 package com.hana.login.common.domain
 
-import com.hana.login.user.controller.request.MemberLogin
 import jakarta.persistence.*
 import java.util.*
 
@@ -8,7 +7,7 @@ import java.util.*
 data class Token (
     @Column(length = 50, updatable = false)
     @Id
-    val memberId: String,
+    val userId: String,
     @Column(updatable = false)
     val expiredAt: Date,
     @Column(length = 200, updatable = false)
@@ -16,12 +15,12 @@ data class Token (
 ){
     companion object{
         fun fixture(
-            memberId: String = "hanana0627",
+            userId: String = "hanana0627",
             expiredAt: Date = Date(),
             refreshToken: String = "refreshToken"
         ) : Token {
             return Token(
-                memberId,
+                userId,
                 expiredAt,
                 refreshToken,
             )

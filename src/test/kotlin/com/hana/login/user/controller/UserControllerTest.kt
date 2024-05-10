@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
-import com.hana.login.user.controller.request.MemberCreate
-import com.hana.login.user.controller.request.MemberLogin
-import com.hana.login.user.domain.MemberEntity
-import com.hana.login.user.repository.MemberCacheRepository
-import com.hana.login.user.repository.MemberRepository
+import com.hana.login.user.controller.request.UserCreate
+import com.hana.login.user.controller.request.UserLogin
+import com.hana.login.user.domain.UserEntity
+import com.hana.login.user.repository.UserCacheRepository
+import com.hana.login.user.repository.UserRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,12 +31,12 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("classpath:test-application.properties")
-class MemberControllerTest @Autowired constructor(
+class UserControllerTest @Autowired constructor(
     private val objectMapper: ObjectMapper,
     private val mvc: MockMvc,
     private val passwordEncoder: BCryptPasswordEncoder,
-    private val memberRepository: MemberRepository,
-    private val memberCacheRepository: MemberCacheRepository,
+    private val userRepository: UserRepository,
+    private val userCacheRepository: UserCacheRepository,
     private val tokenRepository: TokenRepository,
 
     ) {
@@ -49,8 +49,8 @@ class MemberControllerTest @Autowired constructor(
 
     @BeforeEach
     fun beforeEach() {
-        memberRepository.deleteAll()
-        memberCacheRepository.flushAll()
+        userRepository.deleteAll()
+        userCacheRepository.flushAll()
         tokenRepository.deleteAll()
     }
 
@@ -58,12 +58,12 @@ class MemberControllerTest @Autowired constructor(
     @Test
     fun 아이디중복_검증시_중복된아이디가_없으면_true를_반환한다() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture(memberId = "hanana0627")
-        memberRepository.save(entity)
+        val entity: UserEntity = UserEntity.fixture(userId = "hanana0627")
+        userRepository.save(entity)
 
 
         //when & then
-        mvc.perform(get("/api/v1/duplicate/{memberId}", "hanana9999"))
+        mvc.perform(get("/api/v1/duplicate/{userId}", "hanana9999"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(APPLICATION_JSON))
             .andExpect(content().string("true"))
@@ -73,13 +73,13 @@ class MemberControllerTest @Autowired constructor(
     @Test
     fun 아이디중복_검증시_중복된아이디라면_예외를_발생한다() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture(memberId = "hanana0627")
-        memberRepository.save(entity)
+        val entity: UserEntity = UserEntity.fixture(userId = "hanana0627")
+        userRepository.save(entity)
 
         //when & then
-        mvc.perform(get("/api/v1/duplicate/{memberId}", "hanana0627"))
+        mvc.perform(get("/api/v1/duplicate/{userId}", "hanana0627"))
             .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.DUPLICATED_MEMBER_ID.toString()))
+            .andExpect(jsonPath("$.errorCode").value(ErrorCode.DUPLICATED_USER_ID.toString()))
             .andExpect(jsonPath("$.message").value("이미 가입된 회원입니다."))
             .andDo(print())
     }
@@ -87,16 +87,16 @@ class MemberControllerTest @Autowired constructor(
     @Test
     fun 올바른_정보_입력시_회원가입이_성공한다() {
         //given
-        val before: Long = memberRepository.count()
-        val memberCreate = MemberCreate.fixture(
-            memberId = "hanana0627",
-            memberName = "박하나",
+        val before: Long = userRepository.count()
+        val userCreate = UserCreate.fixture(
+            userId = "hanana0627",
+            userName = "박하나",
             password = "password",
             phoneNumber = "01011112222",
             gender = Gender.F,
         )
 
-        val json = objectMapper.writeValueAsString(memberCreate)
+        val json = objectMapper.writeValueAsString(userCreate)
 
         //when
         mvc.perform(
@@ -108,12 +108,12 @@ class MemberControllerTest @Autowired constructor(
             .andDo(print())
 
         //then
-        val member: MemberEntity = memberRepository.findByMemberId("hanana0627")!!
-        assertThat(member.memberId).isEqualTo("hanana0627")
-        assertThat(true).isEqualTo(passwordEncoder.matches("password", member.password))
-        assertThat(member.phoneNumber).isEqualTo("01011112222")
-        assertThat(member.gender).isEqualTo(Gender.F)
-        val after: Long = memberRepository.count()
+        val user: UserEntity = userRepository.findByUserId("hanana0627")!!
+        assertThat(user.userId).isEqualTo("hanana0627")
+        assertThat(true).isEqualTo(passwordEncoder.matches("password", user.password))
+        assertThat(user.phoneNumber).isEqualTo("01011112222")
+        assertThat(user.gender).isEqualTo(Gender.F)
+        val after: Long = userRepository.count()
         assertThat(after).isEqualTo(before + 1)
 
     }
@@ -121,16 +121,16 @@ class MemberControllerTest @Autowired constructor(
     @Test
     fun 회원가입시_중복된_아이디인_경우_예외를_발생한다() {
         //given
-        val member: MemberEntity = MemberEntity.fixture(
-            memberId = "hanana0627"
+        val user: UserEntity = UserEntity.fixture(
+            userId = "hanana0627"
         )
-        memberRepository.save(member)
+        userRepository.save(user)
 
-        val memberCreate = MemberCreate.fixture(
-            memberId = "hanana0627",
+        val userCreate = UserCreate.fixture(
+            userId = "hanana0627",
         )
 
-        val json = objectMapper.writeValueAsString(memberCreate)
+        val json = objectMapper.writeValueAsString(userCreate)
 
         //when & then
         mvc.perform(
@@ -138,7 +138,7 @@ class MemberControllerTest @Autowired constructor(
                 .contentType(APPLICATION_JSON)
                 .content(json)
         )
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.DUPLICATED_MEMBER_ID.toString()))
+            .andExpect(jsonPath("$.errorCode").value(ErrorCode.DUPLICATED_USER_ID.toString()))
             .andExpect(jsonPath("$.message").value("이미 가입된 회원입니다."))
             .andDo(print())
     }
@@ -146,17 +146,17 @@ class MemberControllerTest @Autowired constructor(
     @Test
     fun 올바른_정보를_입력하면_로그인이_성공하고_jwt_토큰을_응답으로_내리고_쿠키로_refresh_토큰을_반환한다() {
         //given
-        val member: MemberEntity = MemberEntity.fixture(
-            memberId = "hanana0627",
+        val user: UserEntity = UserEntity.fixture(
+            userId = "hanana0627",
             password = passwordEncoder.encode("password"),
         )
-        memberRepository.save(member)
+        userRepository.save(user)
 
-        val memberLogin: MemberLogin = MemberLogin.fixture(
-            memberId = "hanana0627",
+        val userLogin: UserLogin = UserLogin.fixture(
+            userId = "hanana0627",
             password = "password",
         )
-        val json: String = objectMapper.writeValueAsString(memberLogin)
+        val json: String = objectMapper.writeValueAsString(userLogin)
 
         //when & then
         mvc.perform(
@@ -166,25 +166,25 @@ class MemberControllerTest @Autowired constructor(
         )
             .andDo(print())
             .andExpect(status().isOk)
-            .andExpect(content().string("Bearer $secretKey${member.memberId}${member.memberName}$expiredMs"))
-            .andExpect(cookie().value("refresh", "Refresh$secretKey${member.memberId}$refreshMs"))
+            .andExpect(content().string("Bearer $secretKey${user.userId}${user.userName}$expiredMs"))
+            .andExpect(cookie().value("refresh", "Refresh$secretKey${user.userId}$refreshMs"))
 
     }
 
     @Test
     fun 로그인시_아이디나_패스워드를_잘못_입력하면_예외가_발생한다() {
         //given
-        val member: MemberEntity = MemberEntity.fixture(
-            memberId = "hanana0627",
+        val user: UserEntity = UserEntity.fixture(
+            userId = "hanana0627",
             password = passwordEncoder.encode("password"),
         )
-        memberRepository.save(member)
+        userRepository.save(user)
 
-        val memberLogin: MemberLogin = MemberLogin.fixture(
-            memberId = "wrongId",
+        val userLogin: UserLogin = UserLogin.fixture(
+            userId = "wrongId",
             password = "password",
         )
-        val json: String = objectMapper.writeValueAsString(memberLogin)
+        val json: String = objectMapper.writeValueAsString(userLogin)
 
         //when & then
         mvc.perform(
@@ -193,7 +193,7 @@ class MemberControllerTest @Autowired constructor(
                 .content(json)
         )
             .andExpect(status().isNotFound)
-            .andExpect(jsonPath("$.errorCode").value(ErrorCode.MEMBER_NOT_FOUNT.toString()))
+            .andExpect(jsonPath("$.errorCode").value(ErrorCode.USER_NOT_FOUNT.toString()))
             .andExpect(jsonPath("$.message").value("회원 정보가 없습니다."))
             .andDo(print())
     }
@@ -214,42 +214,42 @@ class MemberControllerTest @Autowired constructor(
     @Test
     fun 로그인이_성공하고_유효한_요청을_보내면_유저의_이름_및_전화번호를_반환한다_redis_캐시_없는경우도_성공() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture(
-            memberId= "hanana0627",
-            memberName = "박하나",
+        val entity: UserEntity = UserEntity.fixture(
+            userId= "hanana0627",
+            userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        memberRepository.save(entity)
+        userRepository.save(entity)
 
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
         //when & then
         mvc.perform(get("/api/v2/auth").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.memberId").value("hanana0627"))
-            .andExpect(jsonPath("$.memberName").value("박하나"))
+            .andExpect(jsonPath("$.userId").value("hanana0627"))
+            .andExpect(jsonPath("$.userName").value("박하나"))
             .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
             .andDo(print())
     }
     @Test
     fun 로그인이_성공하고_유효한_요청을_보내면_유저의_이름_및_전화번호를_반환한다_redis_캐시_사용하는_경우() {
         //given
-        val entity: MemberEntity = MemberEntity.fixture(
-            memberId= "hanana0627",
-            memberName = "박하나",
+        val entity: UserEntity = UserEntity.fixture(
+            userId= "hanana0627",
+            userName = "박하나",
             password = passwordEncoder.encode("password"),
             phoneNumber = "01012345678")
 
-        memberCacheRepository.setMember(entity)
+        userCacheRepository.setUser(entity)
 
         val token: String = "Bearer tokenHeader.tokenPayload.tokenSignature"
 
         //when & then
         mvc.perform(get("/api/v2/auth").header("AUTHORIZATION", token))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.memberId").value("hanana0627"))
-            .andExpect(jsonPath("$.memberName").value("박하나"))
+            .andExpect(jsonPath("$.userId").value("hanana0627"))
+            .andExpect(jsonPath("$.userName").value("박하나"))
             .andExpect(jsonPath("$.phoneNumber").value("01012345678"))
             .andDo(print())
     }

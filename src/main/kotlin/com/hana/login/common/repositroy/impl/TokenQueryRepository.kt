@@ -18,6 +18,6 @@ class TokenQueryRepository(
         queryFactory.update(token)
             .set(token.expiredAt, entity.expiredAt)
             .set(token.refreshToken, entity.refreshToken)
-            .where(token.memberId.eq(entity.memberId)).execute()
+            .where(token.userId.eq(entity.userId)).execute()
     }
 }

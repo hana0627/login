@@ -6,8 +6,8 @@ import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.common.repositroy.impl.TokenQueryRepository
 import com.hana.login.common.utils.JwtUtils
-import com.hana.login.user.domain.MemberEntity
-import com.hana.login.user.repository.MemberCacheRepository
+import com.hana.login.user.domain.UserEntity
+import com.hana.login.user.repository.UserCacheRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -31,7 +31,7 @@ import javax.crypto.spec.SecretKeySpec
 class JwtUtilsImpl(
     private val tokenRepository: TokenRepository,
     private val tokenQueryRepository: TokenQueryRepository,
-    private val memberCacheRepository: MemberCacheRepository,
+    private val userCacheRepository: UserCacheRepository,
 ) : JwtUtils {
     @Value("\${jwt.secret-key}")
     private val secretKey: String? = null
@@ -49,8 +49,8 @@ class JwtUtilsImpl(
      */
     override fun generateToken(
         response: HttpServletResponse,
-        memberId: String,
-        memberName: String,
+        userId: String,
+        userName: String,
         phoneNumber: String,
         password: String
     ): String {
@@ -58,11 +58,11 @@ class JwtUtilsImpl(
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
         // refreshToken 쿠키에 저장 - start
-        val refreshCookie: ResponseCookie = createRefreshToken(memberId)
+        val refreshCookie: ResponseCookie = createRefreshToken(userId)
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, memberId, memberName,phoneNumber, password, expiredMs)
+        return createToken(secretKey, userId, userName, phoneNumber, password, expiredMs)
     }
 
 
@@ -79,17 +79,17 @@ class JwtUtilsImpl(
     /**
      * token -> 회원 아이디 추출
      */
-    override fun getMemberId(token: String): String {
+    override fun getUserId(token: String): String {
         val claims: Claims = extreactClaims(token)
-        return claims["memberId"].toString()
+        return claims["userId"].toString()
     }
 
     /**
      * token -> 회원 이름 추출
      */
-    private fun getMemberName(token: String): String {
+    private fun getUserName(token: String): String {
         val claims: Claims = extreactClaims(token)
-        return claims["memberName"].toString()
+        return claims["userName"].toString()
     }
 
     /**
@@ -122,10 +122,10 @@ class JwtUtilsImpl(
         }
 
 
-        val memberEntity: MemberEntity? = memberCacheRepository.getMember(getMemberId(accessToken))
+        val userEntity: UserEntity? = userCacheRepository.getUser(getUserId(accessToken))
         // TOD 정상동작 확인
-        if(memberEntity == null) {
-            throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
+        if(userEntity == null) {
+            throw ApplicationException(ErrorCode.USER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
         }
         
         
@@ -134,14 +134,14 @@ class JwtUtilsImpl(
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.phoneNumber, memberEntity.password, expiredMs)
+        val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken), userEntity.phoneNumber, userEntity.password, expiredMs)
 
         val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
         val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
 
         // newAccessToken의 만료시간이 refreshToken의 만료시간보다 길면 refreshToken 갱신
         if (newTokenExpired > refreshTokenExpired) {
-            val refreshCookie: ResponseCookie = createRefreshToken(getMemberId(accessToken))
+            val refreshCookie: ResponseCookie = createRefreshToken(getUserId(accessToken))
             response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         }
 
@@ -164,13 +164,13 @@ class JwtUtilsImpl(
         // refreshToken 검증 - end
 
         // accessToken의 id와 refreshToken id가 같은지 확인
-        if (getMemberId(accessToken) != getMemberId(refreshToken)) {
+        if (getUserId(accessToken) != getUserId(refreshToken)) {
             log.error("inValidated is token")
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "토큰 정보가 일치하지 않습니다.")
         }
 
         // refreshToken이 DB에 저장되어 있는지 확인
-        if (tokenRepository.findById(getMemberId(refreshToken)).isEmpty) {
+        if (tokenRepository.findById(getUserId(refreshToken)).isEmpty) {
             log.error("inValidated is refreshToken")
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다")
         }
@@ -214,13 +214,13 @@ class JwtUtilsImpl(
         return Keys.hmacShaKeyFor(keyByte)
     }
 
-    private fun createRefreshToken(memberId: String): ResponseCookie {
+    private fun createRefreshToken(userId: String): ResponseCookie {
         if (refreshMs == null || secretKey == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR, "secretKey 혹은 refreshMs가 존재하지 않습니다.")
         }
 
         val claims: Claims = Jwts.claims()
-        claims.put("memberId", memberId)
+        claims.put("userId", userId)
         val expiredDate: Date = Date(Date().time + (refreshMs * 1000))
 
         // refreshToken 생성
@@ -231,11 +231,11 @@ class JwtUtilsImpl(
             .compact()
         // 토큰 저장
         val token = Token(
-            memberId = memberId,
+            userId = userId,
             expiredAt = expiredDate,
             refreshToken = refreshToken)
 
-        val exist: Boolean = tokenRepository.existsById(memberId)
+        val exist: Boolean = tokenRepository.existsById(userId)
         if (exist) {
             //@Transactional : private Method라서 repository 레이어에 적용했음
             tokenQueryRepository.update(token)
@@ -255,16 +255,16 @@ class JwtUtilsImpl(
 
     private fun createToken(
         secretKey: String,
-        memberId: String,
-        memberName: String,
+        userId: String,
+        userName: String,
         phoneNumber: String,
         password: String,
         expiredMs: Long
     ): String {
 
         val claims: Claims = Jwts.claims()
-        claims.put("memberId", memberId)
-        claims.put("memberName", memberName)
+        claims.put("userId", userId)
+        claims.put("userName", userName)
 
         val token: String = "Bearer " + Jwts.builder()
             .setClaims(claims)
@@ -276,8 +276,8 @@ class JwtUtilsImpl(
 
         
         
-        memberCacheRepository.setMember(
-            MemberEntity.fixture(memberId= memberId, memberName = memberName, phoneNumber= phoneNumber, password= password)
+        userCacheRepository.setUser(
+            UserEntity.fixture(userId= userId, userName = userName, phoneNumber= phoneNumber, password= password)
         )
 
         return token

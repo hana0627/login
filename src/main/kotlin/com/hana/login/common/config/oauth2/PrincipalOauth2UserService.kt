@@ -4,8 +4,8 @@ import com.hana.login.common.domain.CustomUserDetails
 import com.hana.login.common.domain.en.Gender
 import com.hana.login.common.exception.ApplicationException
 import com.hana.login.common.exception.en.ErrorCode
-import com.hana.login.user.domain.MemberEntity
-import com.hana.login.user.repository.MemberRepository
+import com.hana.login.user.domain.UserEntity
+import com.hana.login.user.repository.UserRepository
 import com.hana.login.common.config.oauth2.provider.Oauth2UserInfo
 import com.hana.login.common.config.oauth2.provider.impl.GoogleUserInfo
 import com.hana.login.common.config.oauth2.provider.impl.KakaoUserInfo
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service
 @Service
 @RequiredArgsConstructor
 class PrincipalOauth2UserService(
-    private val memberRepository: MemberRepository,
+    private val userRepository: UserRepository,
 ): DefaultOAuth2UserService() {
 
     override fun loadUser(userRequest: OAuth2UserRequest?): CustomUserDetails {
@@ -68,38 +68,38 @@ class PrincipalOauth2UserService(
             throw ApplicationException(ErrorCode.UNSUPPORTED_PROVIDER, "지원하지 않는 로그인 타입입니다.")
         }
 
-        val memberEntity: MemberEntity = getMember(oauth2UserInfo)
+        val userEntity: UserEntity = getUser(oauth2UserInfo)
 
-        return CustomUserDetails(memberEntity, oauth2User.attributes)
+        return CustomUserDetails(userEntity, oauth2User.attributes)
     }
 
 
-    private fun getMember(oauth2UserInfo: Oauth2UserInfo): MemberEntity {
+    private fun getUser(oauth2UserInfo: Oauth2UserInfo): UserEntity {
         val provider: String = oauth2UserInfo.getProvider()
         val providerId: String = oauth2UserInfo.getProviderId()
-        val memberId: String = provider + "_" + providerId
+        val userId: String = provider + "_" + providerId
 
         val userName: String = oauth2UserInfo.getName()
 
         val phoneNumber: String = oauth2UserInfo.getPhoneNumber() ?: "010-0000-0000"
         val gender: Gender = oauth2UserInfo.getGender()
 
-        val optionalMember: MemberEntity? = memberRepository.findByMemberId(memberId)
-        val memberEntity: MemberEntity
+        val optionalUser: UserEntity? = userRepository.findByUserId(userId)
+        val userEntity: UserEntity
 
-        if (optionalMember == null) {
-            memberEntity = MemberEntity(
-                memberId = memberId,
-                memberName = userName,
+        if (optionalUser == null) {
+            userEntity = UserEntity(
+                userId = userId,
+                userName = userName,
                 password = "password",
                 phoneNumber = phoneNumber,
                 gender = gender,
                 id = null,
             )
-            memberRepository.save(memberEntity)
+            userRepository.save(userEntity)
         } else {
-            memberEntity = optionalMember
+            userEntity = optionalUser
         }
-        return memberEntity
+        return userEntity
     }
 }

@@ -1,16 +1,16 @@
 package com.hana.login.user.controller.request
 
-data class MemberLogin(
-    val memberId: String,
+data class UserLogin(
+    val userId: String,
     val password: String,
 ) {
     companion object {
         fun fixture(
-            memberId: String = "hanana0627",
+            userId: String = "hanana0627",
             password: String = "password",
-        ) : MemberLogin {
-            return MemberLogin(
-                memberId = memberId,
+        ) : UserLogin {
+            return UserLogin(
+                userId = userId,
                 password = password,
             )
         }

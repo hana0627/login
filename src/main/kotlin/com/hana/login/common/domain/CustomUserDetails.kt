@@ -1,19 +1,19 @@
 package com.hana.login.common.domain
 
-import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.domain.UserEntity
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.core.user.OAuth2User
 
 class CustomUserDetails(
-    private val memberEntity: MemberEntity,
+    private val userEntity: UserEntity,
 
     private val attributes: MutableMap<String, Any>,
 ) : UserDetails, OAuth2User {
 
     // oauth2
     override fun getName(): String {
-        return memberEntity.memberId
+        return userEntity.userId
     }
 
     // oauth2
@@ -27,11 +27,11 @@ class CustomUserDetails(
     }
 
     override fun getPassword(): String {
-        return memberEntity.password
+        return userEntity.password
     }
 
     override fun getUsername(): String {
-        return memberEntity.memberId
+        return userEntity.userId
     }
 
     override fun isAccountNonExpired(): Boolean {
@@ -50,12 +50,11 @@ class CustomUserDetails(
         return true
     }
 
-
-    fun getMemberName(): String {
-        return memberEntity.memberName
+    fun getUserName(): String {
+        return userEntity.userName
     }
 
     fun getPhoneNumber(): String {
-        return memberEntity.phoneNumber
+        return userEntity.phoneNumber
     }
 }

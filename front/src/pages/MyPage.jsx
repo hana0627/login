@@ -5,8 +5,8 @@ import Swal from "sweetalert2";
 function MyPage() {
     
     const [isRender, setIsRender] = useState(false)
-    const [memberId, setMemberId] = useState(false)
-    const [memberName, setMemberName] = useState(false)
+    const [userId, setUserId] = useState(false)
+    const [userName, setUserName] = useState(false)
     const [phoneNumber, setPhoneNumber] = useState(false)
 
 
@@ -16,8 +16,8 @@ function MyPage() {
             .then(response => {
                 setIsRender(true)
                 const data = response.data
-                setMemberId(data.memberId)
-                setMemberName(data.memberName)
+                setUserId(data.userId)
+                setUserName(data.userName)
                 setPhoneNumber(data.phoneNumber)
                 // TODO redux 혹은 recoil 과같은 전역변수로 저장할수도 있음
                 // 해볼까...? 어차피 리액트 여기까지 다룬거...
@@ -61,7 +61,7 @@ function MyPage() {
                     <div className="signup-page">
                         <div className="signup-wrapper">
                             {/*<h2>${name} 님 <br/>반갑습니다.</h2><br/><br/>*/}
-                            <h2>{memberName} 님 <br/>반갑습니다.</h2><br/><br/>
+                            <h2>{userName} 님 <br/>반갑습니다.</h2><br/><br/>
 
                             <span className="ft-sm ft-bold">선생님의 핸드폰 번호는</span>
                             <span className="ft-sm ft-bold">{phoneNumber} 에요</span><br/><br/>

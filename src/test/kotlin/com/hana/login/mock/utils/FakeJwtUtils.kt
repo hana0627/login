@@ -6,8 +6,8 @@ import com.hana.login.common.exception.en.ErrorCode
 import com.hana.login.common.repositroy.TokenRepository
 import com.hana.login.common.repositroy.impl.TokenQueryRepository
 import com.hana.login.common.utils.JwtUtils
-import com.hana.login.user.domain.MemberEntity
-import com.hana.login.user.repository.MemberCacheRepository
+import com.hana.login.user.domain.UserEntity
+import com.hana.login.user.repository.UserCacheRepository
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -25,7 +25,7 @@ import java.util.*
 class FakeJwtUtils @Autowired constructor(
     private val tokenRepository: TokenRepository,
     private val tokenQueryRepository: TokenQueryRepository,
-    private val memberCacheRepository: MemberCacheRepository,
+    private val userCacheRepository: UserCacheRepository,
 ) : JwtUtils{
 
 
@@ -36,17 +36,17 @@ class FakeJwtUtils @Autowired constructor(
     private val refreshMs: Long = 5000
 
 
-    override fun generateToken(response: HttpServletResponse, memberId: String, memberName: String, phoneNumber: String, password: String): String {
+    override fun generateToken(response: HttpServletResponse, userId: String, userName: String, phoneNumber: String, password: String): String {
 
         if (secretKey == null || expiredMs == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"SecretKey 혹은 expiredMs가 존재하지 않습니다.")
         }
         // refreshToken 쿠키에 저장 - start
-        val refreshCookie: ResponseCookie = createRefreshToken(memberId)
+        val refreshCookie: ResponseCookie = createRefreshToken(userId)
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, memberId, memberName, phoneNumber, password, expiredMs)
+        return createToken(secretKey, userId, userName, phoneNumber, password, expiredMs)
 
 //        return "Bearer tokenHeader.tokenPayload.tokenSignature"
     }
@@ -55,11 +55,11 @@ class FakeJwtUtils @Autowired constructor(
         return false;
     }
 
-    override fun getMemberId(token: String): String {
+    override fun getUserId(token: String): String {
         return "hanana0627"
     }
 
-    private fun getMemberName(token: String): String {
+    private fun getUserName(token: String): String {
         return "박하나"
     }
 
@@ -78,10 +78,10 @@ class FakeJwtUtils @Autowired constructor(
 
 
 
-        val memberEntity: MemberEntity? = memberCacheRepository.getMember(getMemberId(accessToken))
+        val userEntity: UserEntity? = userCacheRepository.getUser(getUserId(accessToken))
         // TOD 정상동작 확인
-        if(memberEntity == null) {
-            throw ApplicationException(ErrorCode.MEMBER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
+        if(userEntity == null) {
+            throw ApplicationException(ErrorCode.USER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
         }
 
         // token 검증 - start
@@ -89,7 +89,7 @@ class FakeJwtUtils @Autowired constructor(
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getMemberId(accessToken), getMemberName(accessToken), memberEntity.phoneNumber, memberEntity.password, expiredMs).replace("Bearer ","Bearer new")
+        val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken), userEntity.phoneNumber, userEntity.password, expiredMs).replace("Bearer ","Bearer new")
 
         return newToken
     }
@@ -109,12 +109,12 @@ class FakeJwtUtils @Autowired constructor(
         // refreshToken 검증 - end
 
         // accessToken의 id와 refreshToken id가 같은지 확인
-        if(getMemberId(accessToken) != getMemberId(refreshToken)) {
+        if(getUserId(accessToken) != getUserId(refreshToken)) {
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "토큰 정보가 일치하지 않습니다.")
         }
 
         // refreshToken이 DB에 저장되어 있는지 확인
-        if(tokenRepository.findById(getMemberId(refreshToken)).isEmpty) {
+        if(tokenRepository.findById(getUserId(refreshToken)).isEmpty) {
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다")
         }
     }
@@ -139,24 +139,24 @@ class FakeJwtUtils @Autowired constructor(
         return Keys.hmacShaKeyFor(keyByte)
     }
 
-    private fun createRefreshToken(memberId: String): ResponseCookie {
+    private fun createRefreshToken(userId: String): ResponseCookie {
         if (refreshMs == null || secretKey == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"secretKey 혹은 refreshMs가 존재하지 않습니다.")
         }
 
         val claims: Claims = Jwts.claims()
-        claims.put("memberId", memberId)
+        claims.put("userId", userId)
         val expiredDate: Date = Date(Date().time + (refreshMs * 1000))
 
         // refreshToken 생성
-        val refreshToken: String =   "Refresh" + secretKey + memberId  + refreshMs
+        val refreshToken: String =   "Refresh" + secretKey + userId  + refreshMs
         // 토큰 저장
         val token = Token(
-            memberId = memberId,
+            userId = userId,
             expiredAt = expiredDate,
             refreshToken = refreshToken)
 
-        val exist: Boolean = tokenRepository.existsById(memberId)
+        val exist: Boolean = tokenRepository.existsById(userId)
         if (exist) {
             //@Transactional : private Method라서 repository 레이어에 적용했음
             tokenQueryRepository.update(token)
@@ -175,20 +175,20 @@ class FakeJwtUtils @Autowired constructor(
 
     private fun createToken(
         secretKey: String,
-        memberId: String,
-        memberName: String,
+        userId: String,
+        userName: String,
         phoneNumber: String,
         password: String,
         expiredMs: Long
     ): String {
 
         val claims: Claims = Jwts.claims()
-        claims.put("memberId", memberId)
-        claims.put("memberName", memberName)
+        claims.put("userId", userId)
+        claims.put("userName", userName)
 
-        val token: String = "Bearer " + secretKey + memberId + memberName + expiredMs
+        val token: String = "Bearer " + secretKey + userId + userName + expiredMs
 
-        memberCacheRepository.setMember(MemberEntity.fixture(memberId = memberId, memberName = memberName, phoneNumber=phoneNumber, password= password))
+        userCacheRepository.setUser(UserEntity.fixture(userId = userId, userName = userName, phoneNumber=phoneNumber, password= password))
 
         return token
     }

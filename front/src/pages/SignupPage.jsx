@@ -5,25 +5,25 @@ import {useNavigate} from "react-router-dom";
 
 function SignupPage() {
 
-    const [memberId, setMemberId] = useState('')
-    const [memberName, setMemberName] = useState('')
+    const [userId, setUserId] = useState('')
+    const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
     const [passwordCheck, setPasswordCheck] = useState('')
     const [phoneNumber, setPhoneNumber] = useState('')
-    const [memberIdCheck, setMemberIdCheck] = useState(false)
+    const [userIdCheck, setUserIdCheck] = useState(false)
     const [gender, setGender] = useState('')
     const [agreed, setAgreed] = useState(false);
 
     const navigate = useNavigate()
 
 
-    function memberIdHandle(e) {
-        setMemberId(e.target.value)
-        setMemberIdCheck(false); // id 입력값 변경시 중복확인인증 해제
+    function userIdHandle(e) {
+        setUserId(e.target.value)
+        setUserIdCheck(false); // id 입력값 변경시 중복확인인증 해제
     }
 
-    function memberNameHandle(e) {
-        setMemberName(e.target.value)
+    function userNameHandle(e) {
+        setUserName(e.target.value)
     }
 
     function passwordHandle(e) {
@@ -47,8 +47,7 @@ function SignupPage() {
     }
 
     function duplicateBtnClick() {
-        console.log(memberId)
-        if (memberId === '') {
+        if (userId === '') {
             Swal.fire({
                 title: '실패',
                 html: '아이디를 입력해주세요.',
@@ -58,7 +57,7 @@ function SignupPage() {
             return false;
         }
 
-        if (memberId.length < 8 || memberId.length > 20) {
+        if (userId.length < 8 || userId.length > 20) {
             Swal.fire({
                 title: '실패',
                 html: "아이디는 8자에서 20자 사이어야 합니다.",
@@ -69,7 +68,7 @@ function SignupPage() {
         }
 
         const regex = /^[a-z0-9]*$/;
-        if (!regex.test(memberId)) {
+        if (!regex.test(userId)) {
             Swal.fire({
                 title: '실패',
                 html: "아아디는 영문 소문자로만 또는 영문 소문자와 숫자의 조합으로 이루어져야 합니다.",
@@ -80,7 +79,7 @@ function SignupPage() {
         }
 
 
-        axios.get('http://localhost:8080/api/v1/duplicate/' + memberId)
+        axios.get('http://localhost:8080/api/v1/duplicate/' + userId)
             .then(
                 Swal.fire({
                     title: '성공',
@@ -90,7 +89,7 @@ function SignupPage() {
                 })
                     .then(result => {
                         if (result.isConfirmed) {
-                            setMemberIdCheck(true);
+                            setUserIdCheck(true);
                         }
                     })
             ).catch(error => {
@@ -115,7 +114,7 @@ function SignupPage() {
     }
 
     function submitBtnClick() {
-        if (!memberIdCheck) {
+        if (!userIdCheck) {
             Swal.fire({
                 title: '실패',
                 html: '아이디 중복확인을 진행해주세요.',
@@ -124,7 +123,7 @@ function SignupPage() {
             });
             return false;
         }
-        if (memberName === '') {
+        if (userName === '') {
             Swal.fire({
                 title: '실패',
                 html: '이름을 입력해주세요.',
@@ -194,14 +193,14 @@ function SignupPage() {
         }
         axios.post('http://localhost:8080/api/v1/join',
             {
-                'memberId': memberId,
-                'memberName': memberName,
+                'userId': userId,
+                'userName': userName,
                 'password': password,
                 'phoneNumber': phoneNumber,
                 'gender': gender
             }).then(() => {
             Swal.fire({
-                title: '실패',
+                title: '성공',
                 html: '회원가입이 완료되었습니다.',
                 icon: 'warning',
                 confirmButtonText: '확인'
@@ -239,12 +238,12 @@ function SignupPage() {
                 <h2>회원가입을 위해<br/>정보를 입력해주세요.</h2><br/><br/>
                 <span className="ft-lightgrey">* 아이디</span><br/><br/>
                 <div className="input-id-wrapper">
-                    <input className="input-id" onChange={(e) => memberIdHandle(e)}/>
+                    <input className="input-id" onChange={(e) => userIdHandle(e)}/>
                     <button className="duplicate-button" onClick={() => duplicateBtnClick()}>아이디 중복 확인</button>
                 </div>
 
                 <span className="ft-lightgrey">*이름</span><br/><br/>
-                <input className="input" onChange={(e) => memberNameHandle(e)}/>
+                <input className="input" onChange={(e) => userNameHandle(e)}/>
 
                 <span className="ft-lightgrey">* 비밀번호</span><br/><br/>
                 <input className="input" type="password" onChange={(e) => passwordHandle(e)}/>

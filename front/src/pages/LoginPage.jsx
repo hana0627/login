@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 
 function LoginPage() {
 
-    const [memberId, setMemberId] = useState('')
+    const [userId, setUserId] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
 
@@ -25,8 +25,8 @@ function LoginPage() {
     }, [location]);
 
 
-    function memberIdHandle(e) {
-        setMemberId(e.target.value)
+    function userIdHandle(e) {
+        setUserId(e.target.value)
     }
     function passwordHandle(e) {
         setPassword(e.target.value)
@@ -34,7 +34,7 @@ function LoginPage() {
 
 
     function loginBtnClick() {
-        if(memberId === '' ) {
+        if(userId === '' ) {
             Swal.fire({
                 title: '실패',
                 html: '아이디를 입력해주세요.',
@@ -56,7 +56,7 @@ function LoginPage() {
 
         axios.post('http://localhost:8080/api/v1/login',
             {
-                "memberId": memberId,
+                "userId": userId,
                 "password": password
             },
             {withCredentials: true}
@@ -100,8 +100,8 @@ function LoginPage() {
         <div className="login-page">
             <div className="login-wrapper">
                 <h2>Login</h2>
-                <input type="text" className="login-input" placeholder="id" value={memberId}
-                       onChange={(e) => memberIdHandle(e)}/>
+                <input type="text" className="login-input" placeholder="id" value={userId}
+                       onChange={(e) => userIdHandle(e)}/>
                 <input type="password" className="login-input" placeholder="password" value={password}
                        onChange={(e) => passwordHandle(e)}/>
                 <a href="http://localhost:8080/oauth2/authorization/google">

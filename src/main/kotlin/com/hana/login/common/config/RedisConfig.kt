@@ -1,7 +1,7 @@
 package com.hana.login.common.config
 
 import com.hana.login.common.domain.Token
-import com.hana.login.user.domain.MemberEntity
+import com.hana.login.user.domain.UserEntity
 import io.lettuce.core.RedisURI
 import lombok.RequiredArgsConstructor
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties
@@ -35,11 +35,11 @@ class RedisConfig (
 
     // RedisTemplate 설정
     @Bean
-    fun memberRedisTemplate(): RedisTemplate<String, MemberEntity> {
-        val redisTemplate: RedisTemplate<String, MemberEntity> = RedisTemplate()
+    fun userRedisTemplate(): RedisTemplate<String, UserEntity> {
+        val redisTemplate: RedisTemplate<String, UserEntity> = RedisTemplate()
         redisTemplate.connectionFactory = redisConnectionFactory()
         redisTemplate.keySerializer = StringRedisSerializer()
-        redisTemplate.valueSerializer = Jackson2JsonRedisSerializer(MemberEntity::class.java)
+        redisTemplate.valueSerializer = Jackson2JsonRedisSerializer(UserEntity::class.java)
         return redisTemplate
     }
 
