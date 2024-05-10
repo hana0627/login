@@ -1,0 +1,68 @@
+= LOGIN API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+== 아이디 중복확인
+
+=== 요청
+include::{snippets}/duplicateUser/http-request.adoc[]
+include::{snippets}/duplicateUser/path-parameters.adoc[]
+
+=== 응답
+include::{snippets}/duplicateUser/http-response.adoc[]
+
+== 아이디 중복확인 - 중복된 아이디
+
+=== 요청
+include::{snippets}/duplicateUser_error/http-request.adoc[]
+include::{snippets}/duplicateUser_error/path-parameters.adoc[]
+
+=== 응답
+include::{snippets}/duplicateUser_error/http-response.adoc[]
+
+== 회원 등록
+
+=== 요청
+include::{snippets}/createUser/http-request.adoc[]
+include::{snippets}/createUser/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/createUser/http-response.adoc[]
+
+
+== 로그인
+
+=== 요청
+include::{snippets}/login/http-request.adoc[]
+include::{snippets}/login/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/login/http-response.adoc[]
+
+
+
+
+== 마이페이지_인증필수
+
+=== 요청
+include::{snippets}/myPage/http-request.adoc[]
+
+=== 응답
+include::{snippets}/myPage/http-response.adoc[]
+
+
+
+
+== 로그아웃_인증필수
+
+=== 요청
+include::{snippets}/logout/http-request.adoc[]
+
+=== 응답
+include::{snippets}/logout/http-response.adoc[]
+
+
