@@ -61,7 +61,11 @@ class JwtUtilsImpl(
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
         // refreshToken 쿠키에 저장 - end
 
-        return createToken(secretKey, userId, userName, phoneNumber, password, expiredMs)
+        userCacheRepository.setUser(
+            UserEntity.fixture(userId= userId, userName = userName, phoneNumber= phoneNumber, password= password)
+        )
+
+        return createToken(secretKey, userId, userName, expiredMs)
     }
 
 
@@ -120,20 +124,12 @@ class JwtUtilsImpl(
             throw ApplicationException(ErrorCode.TOKEN_NOT_FOUND, "refreshToken이 존재하지 않습니다.")
         }
 
-
-        val userEntity: UserEntity? = userCacheRepository.getUser(getUserId(accessToken))
-        // TOD 정상동작 확인
-        if(userEntity == null) {
-            throw ApplicationException(ErrorCode.USER_NOT_FOUNT, "redis에 캐싱된 유저가 없습니다.")
-        }
-        
-        
         // token 검증 - start
         tokenValidate(refreshToken, accessToken)
         // token 검증 - end
 
         // 신규토큰 생성
-        val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken), userEntity.phoneNumber, userEntity.password, expiredMs)
+        val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken),  expiredMs)
 
         val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
         val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
@@ -259,8 +255,6 @@ class JwtUtilsImpl(
         secretKey: String,
         userId: String,
         userName: String,
-        phoneNumber: String,
-        password: String,
         expiredMs: Long
     ): String {
 
@@ -274,10 +268,6 @@ class JwtUtilsImpl(
             .setExpiration(Date(System.currentTimeMillis() + expiredMs * 1000))
             .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
             .compact()
-
-        userCacheRepository.setUser(
-            UserEntity.fixture(userId= userId, userName = userName, phoneNumber= phoneNumber, password= password)
-        )
 
         return token
     }

@@ -10,6 +10,7 @@ import com.hana.login.common.config.oauth2.provider.Oauth2UserInfo
 import com.hana.login.common.config.oauth2.provider.impl.GoogleUserInfo
 import com.hana.login.common.config.oauth2.provider.impl.KakaoUserInfo
 import com.hana.login.common.config.oauth2.provider.impl.NaverUserInfo
+import com.hana.login.user.repository.UserCacheRepository
 import lombok.RequiredArgsConstructor
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service
 @Service
 @RequiredArgsConstructor
 class PrincipalOauth2UserService(
+    private val userCacheRepository: UserCacheRepository,
     private val userRepository: UserRepository,
 ): DefaultOAuth2UserService() {
 
@@ -84,7 +86,7 @@ class PrincipalOauth2UserService(
         val phoneNumber: String = oauth2UserInfo.getPhoneNumber() ?: "010-0000-0000"
         val gender: Gender = oauth2UserInfo.getGender()
 
-        val optionalUser: UserEntity? = userRepository.findByUserId(userId)
+        val optionalUser: UserEntity? = userCacheRepository.getUser(userId)?: userRepository.findByUserId(userId)
         val userEntity: UserEntity
 
         if (optionalUser == null) {
