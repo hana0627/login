@@ -124,11 +124,12 @@ sourceSets {
 }
 
 // gradle clean 시에 QClass 디렉토리 삭제
-tasks.named("clean") {
-    doLast {
-        generated.deleteRecursively()
-    }
-}
+
+//tasks.named("clean") {
+//    doLast {
+//        generated.deleteRecursively()
+//    }
+//}
 
 
 kapt {

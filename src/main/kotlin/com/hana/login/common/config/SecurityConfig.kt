@@ -26,6 +26,9 @@ class SecurityConfig(
     @Value("\${jwt.secret-key}")
     private val secretKey: String? = null
 
+    @Value("\${url.front}")
+    private val frontEndUrl: String? = null
+
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http.csrf { csrf -> csrf.disable() }
@@ -45,13 +48,13 @@ class SecurityConfig(
             //oauth2 로그인
             .oauth2Login { o ->
                 o.loginPage("http://localhost:3000/login") // 권한 없을시
-                    o.userInfoEndpoint { userInfoEndpoint ->
-                        userInfoEndpoint.userService(principalOauth2UserService)
-                    }
+                o.userInfoEndpoint { userInfoEndpoint ->
+                    userInfoEndpoint.userService(principalOauth2UserService)
+                }
                     .successHandler { request, response, authentication ->
                         val principal: CustomUserDetails = authentication.principal as CustomUserDetails
                         val jwtToken = jwtUtils.generateToken(request, response, principal.name, principal.getUserName(), principal.getPhoneNumber(), principal.password)
-                        response.sendRedirect("http://localhost:3000/login?token=$jwtToken")
+                        response.sendRedirect("$frontEndUrl/login?token=$jwtToken")
                     }
             }
 

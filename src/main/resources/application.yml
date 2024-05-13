@@ -67,3 +67,6 @@ jwt:
   #30min
   token.expired-time-ms: 1800
   refresh.expired-time-ms: 4000
+
+url:
+  front: ${FRONT_END_URL}
