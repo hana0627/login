@@ -42,3 +42,4 @@ out/
 
 ### node ###
 /front/node_modules
+front/.env
