@@ -17,9 +17,9 @@ function MyPage() {
             .then(response => {
                 setIsRender(true)
                 const data = response.data
-                setUserId(data.userId)
-                setUserName(data.userName)
-                setPhoneNumber(data.phoneNumber)
+                setUserId(data.result.userId)
+                setUserName(data.result.userName)
+                setPhoneNumber(data.result.phoneNumber)
                 // TODO redux 혹은 recoil 과같은 전역변수로 저장할수도 있음
                 // 해볼까...? 어차피 리액트 여기까지 다룬거...
 

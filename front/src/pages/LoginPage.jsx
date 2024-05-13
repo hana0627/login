@@ -61,7 +61,7 @@ function LoginPage() {
             },
             {withCredentials: true}
         ).then(response => {
-            localStorage.setItem('accessToken',response.data);
+            localStorage.setItem('accessToken',response.data.result);
             navigate('/MyPage')
         }).catch(error => {
             const data = error.response.data
@@ -84,13 +84,6 @@ function LoginPage() {
         });
     }
 
-    function naverLogin() {
-        alert('구현중입니다.')
-    }
-
-    function kakaoLogin() {
-        alert('구현중입니다.')
-    }
     function SignupBtnClick () {
         navigate('/SignupPage')
     }
