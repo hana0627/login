@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 
 function MyPage() {
 
+    const base_url = process.env.REACT_APP_API_URL
+
     const [isRender, setIsRender] = useState(false)
     const [userId, setUserId] = useState(false)
     const [userName, setUserName] = useState(false)
@@ -13,7 +15,8 @@ function MyPage() {
 
     const accessToken = localStorage.getItem('accessToken')
     function getData() {
-        axios.get('http://localhost:8080/api/v2/auth',{headers: {Authorization: accessToken}})
+        // axios.get('http://localhost:8080/api/v2/auth',{headers: {Authorization: accessToken}})
+        axios.get(base_url+'/api/v2/auth',{headers: {Authorization: accessToken}})
             .then(response => {
                 setIsRender(true)
                 const data = response.data
@@ -45,7 +48,7 @@ function MyPage() {
     }
 
     function logOutBtnClick() {
-        axios.get('http://localhost:8080/api/v2/logout',{headers: {Authorization: accessToken}})
+        axios.get(base_url+'/api/v2/logout',{headers: {Authorization: accessToken}})
             .then(response => {
                 localStorage.removeItem("accessToken")
                 Swal.fire({

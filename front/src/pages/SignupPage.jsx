@@ -5,6 +5,8 @@ import {useNavigate} from "react-router-dom";
 
 function SignupPage() {
 
+    const base_url = process.env.REACT_APP_API_URL
+
     const [userId, setUserId] = useState('')
     const [userName, setUserName] = useState('')
     const [password, setPassword] = useState('')
@@ -79,7 +81,7 @@ function SignupPage() {
         }
 
 
-        axios.get('http://localhost:8080/api/v1/duplicate/' + userId)
+        axios.get(base_url+'/api/v1/duplicate/' + userId)
             .then(
                 Swal.fire({
                     title: '성공',
@@ -191,7 +193,7 @@ function SignupPage() {
             })
             return false;
         }
-        axios.post('http://localhost:8080/api/v1/join',
+        axios.post(base_url+'/api/v1/join',
             {
                 'userId': userId,
                 'userName': userName,

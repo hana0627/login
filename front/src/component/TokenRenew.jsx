@@ -4,6 +4,10 @@ import { useLocation } from 'react-router-dom';
 import axios from "axios";
 import Swal from "sweetalert2";
 async function checkToken() {
+
+
+
+
     try {
         const token = localStorage.getItem('accessToken');
         if (token != null) {
@@ -24,9 +28,12 @@ async function checkToken() {
 }
 
 async function renewToken() {
+
+    const base_url = process.env.REACT_APP_API_URL
+
     const accessToken = localStorage.getItem('accessToken')
 
-    await axios.get('http://localhost:8080/api/v2/regenerate',
+    await axios.get(base_url+'/api/v2/regenerate',
         {headers: {Authorization: accessToken}
             ,withCredentials: true})
         .then(response => {

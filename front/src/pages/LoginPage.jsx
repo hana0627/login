@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 
 function LoginPage() {
 
+    const base_url = process.env.REACT_APP_API_URL
     const [userId, setUserId] = useState('')
     const [password, setPassword] = useState('')
     const navigate = useNavigate()
@@ -54,7 +55,7 @@ function LoginPage() {
         }
 
 
-        axios.post('http://localhost:8080/api/v1/login',
+        axios.post(base_url+'/api/v1/login',
             {
                 "userId": userId,
                 "password": password
