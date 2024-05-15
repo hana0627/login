@@ -20,6 +20,6 @@ class HealthCheckController {
 
     @GetMapping("/api/v1/hello2")
     fun hello3(): String {
-        return "한번에 되면 얼마나 좋을까3트..."
+        return "한번에 되면 얼마나 좋을까4트..."
     }
 }
