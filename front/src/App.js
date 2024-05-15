@@ -12,6 +12,7 @@ function App() {
         <div className="styleCss">
             <TokenRenew/>
             <Routes>
+                <Route path='/' element={<LoginPage/>}/>
                 <Route path='/login' element={<LoginPage/>}/>
                 <Route path='/SignupPage' element={<SignupPage/>}/>
                 <Route path='/MyPage' element={<MyPage/>}/>
