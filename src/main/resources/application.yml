@@ -59,6 +59,10 @@ spring:
         show_sql: true
         format_sql: true
     open-in-view: false
+  data:
+    redis:
+      host: localhost
+      port: 6378
 
 
 
@@ -70,3 +74,6 @@ jwt:
 
 url:
   front: ${FRONT_END_URL}
+    
+
+
