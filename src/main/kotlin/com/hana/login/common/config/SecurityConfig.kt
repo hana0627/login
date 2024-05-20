@@ -47,7 +47,7 @@ class SecurityConfig(
 
             //oauth2 로그인
             .oauth2Login { o ->
-                o.loginPage("http://localhost:3000/login") // 권한 없을시
+                o.loginPage("$frontEndUrl/login") // 권한 없을시
                 o.userInfoEndpoint { userInfoEndpoint ->
                     userInfoEndpoint.userService(principalOauth2UserService)
                 }
