@@ -98,14 +98,17 @@ function LoginPage() {
                        onChange={(e) => userIdHandle(e)}/>
                 <input type="password" className="login-input" placeholder="password" value={password}
                        onChange={(e) => passwordHandle(e)}/>
-                <a href="http://localhost:8080/oauth2/authorization/google">
+                {/*<a href="http://localhost:8080/oauth2/authorization/google">*/}
+                <a href="http://hanaworlds.net:8080/oauth2/authorization/google">
                     <img src="/img/google_login.jpg" className="btn_login" alt="구글로그인"/>
                 </a>
-                <a href="http://localhost:8080/oauth2/authorization/naver">
+                {/*<a href="http://localhost:8080/oauth2/authorization/naver">*/}
+                <a href="http://hanaworlds.net:8080/oauth2/authorization/naver">
                     <img src="/img/naver_login.jpg" className="btn_login" alt="네이버로그인"/>
                 </a>
 
-                <a href="http://localhost:8080/oauth2/authorization/kakao">
+                {/*<a href="http://localhost:8080/oauth2/authorization/kakao">*/}
+                <a href="http://hanaworlds.net:8080/oauth2/authorization/kakao">
                     <img src="/img/kakao_login.jpg" className="btn_login" alt="카카오로그인"/>
                 </a>
                 {/*<img src="/img/kakao_login.jpg" className="btn_login" onClick={kakaoLogin} alt="카카오로그인"/>*/}
