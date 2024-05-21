@@ -18,6 +18,8 @@ function MyPage() {
         // axios.get('http://localhost:8080/api/v2/auth',{headers: {Authorization: accessToken}})
         axios.get(base_url+'/api/v2/auth',{headers: {Authorization: accessToken}})
             .then(response => {
+                console.log("성공!")
+                console.log(response)
                 setIsRender(true)
                 const data = response.data
                 setUserId(data.result.userId)
@@ -28,6 +30,8 @@ function MyPage() {
 
             })
             .catch(error => {
+                console.log("에러!")
+                console.log(error)
                 const data = error.response.data
                 if (data.getCode === 'INTERNAL_SERVER_ERROR') {
                     Swal.fire({
