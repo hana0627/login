@@ -65,7 +65,7 @@ function LoginPage() {
             localStorage.setItem('accessToken',response.data.result);
             navigate('/MyPage')
         }).catch(error => {
-            const data = error.response.data
+            const data = error.response.data.error
             if(data.getCode === 'INTERNAL_SERVER_ERROR') {
                 Swal.fire({
                     title: '실패',

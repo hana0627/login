@@ -39,11 +39,11 @@ async function renewToken() {
         .then(response => {
             localStorage.setItem('accessToken',response.data);
         }).catch(error => {
-            const data = error.response.data
+            const data = error.response.data.error
             if(data.getCode === 'INTERNAL_SERVER_ERROR') {
                 Swal.fire({
                     title: '실패',
-                    html: '예상하지 못한 에러가a 발생했습니다.<br>다시 시도해주세요',
+                    html: '예상하지 못한 에러가 발생했습니다.<br>다시 시도해주세요',
                     icon: 'warning',
                     confirmButtonText: '확인'
                 });

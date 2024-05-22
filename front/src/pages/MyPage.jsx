@@ -30,9 +30,7 @@ function MyPage() {
 
             })
             .catch(error => {
-                console.log("에러!")
-                console.log(error)
-                const data = error.response.data
+                const data = error.response.data.error
                 if (data.getCode === 'INTERNAL_SERVER_ERROR') {
                     Swal.fire({
                         title: '실패',
@@ -67,7 +65,7 @@ function MyPage() {
                 });
             })
             .catch(error => {
-                const data = error.response.data
+                const data = error.response.data.error
                 if(data.getCode === 'INTERNAL_SERVER_ERROR') {
                     Swal.fire({
                         title: '실패',
