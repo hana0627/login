@@ -1,5 +1,6 @@
 # 🍀 login
 ### jwt, oauth2를 이용한 로그인 템플릿 제작하기
+![bandicam2024-05-2418-09-49-919-ezgif com-video-to-gif-converter](https://github.com/hana0627/login/assets/108846134/ded925bf-4d0e-4306-ac40-f952ab836217)
 
 <br/>
 <br/>
@@ -52,7 +53,7 @@ https://hanaworlds.net
   <br/>
 # Trobule Shooting
 * [MySQL Aceessdenied for user 문제](https://velog.io/@hana0627/Ubuntu-Docker%EC%97%90%EC%84%9C-MySQL-%EC%82%AC%EC%9A%A9%EC%8B%9C-Access-denied-for-user-rootlocalhost)
-* (jwt 인증시 db호출 없애기, redis를 활용한 refresh토큰 관리 , ssl 인증서연결, jenkins 빌드실패 문제, 프리티어 메모리 문제
+* (jwt 인증시 db호출 없애기, redis를 활용한 refresh토큰 관리, oauth2 연결, ssl 인증서연결, jenkins 빌드실패 문제, 프리티어 메모리 문제
   등의 문제를 만났으나, 따로 포스팅으로 남기진 않았습니다.
   <br/>
   <br/>
@@ -60,4 +61,4 @@ https://hanaworlds.net
 
 # 프로젝트 후기
 ---
-작성예정
+작성예정입니다.
