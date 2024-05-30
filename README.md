@@ -19,11 +19,14 @@ https://hanaworlds.net
 * INFRA - dcoker, Jenkis, AWS EC2
 <br/>
 <br/>
+
+
 # ⭐ 개발기간
 2024. 04. 25 ~ 2024. 05. 22
 
 <br/>
 <br/>
+
 # 📖 시스템 아키텍쳐
 ![Architecture Diagram](https://github.com/hana0627/login/assets/108846134/ae3d8e02-b85c-469c-a3c3-1e8a31303764)
 
@@ -50,6 +53,7 @@ https://hanaworlds.net
     
   <br/>
   <br/>
+  
 # Trobule Shooting
 * [MySQL Aceessdenied for user 문제](https://velog.io/@hana0627/Ubuntu-Docker%EC%97%90%EC%84%9C-MySQL-%EC%82%AC%EC%9A%A9%EC%8B%9C-Access-denied-for-user-rootlocalhost)
 * (jwt 인증시 db호출 없애기, redis를 활용한 refresh토큰 관리, oauth2 연결, ssl 인증서연결, jenkins 빌드실패 문제, 프리티어 메모리 문제
