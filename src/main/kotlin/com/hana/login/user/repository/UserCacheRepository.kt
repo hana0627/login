@@ -21,9 +21,9 @@ class UserCacheRepository(
         redisTemplate.opsForValue().set(key, user, USER_CACHE_TTL)
     }
 
-    fun getUser(userId: String): UserEntity? {
+    fun findByUserId(userId: String): UserEntity? {
         val key = "User:$userId"
-        val user:UserEntity? = redisTemplate.opsForValue().get(key)
+        val user: UserEntity? = redisTemplate.opsForValue().get(key)
         log.info("Get User from Redis {} , {}", key, user);
         return user
     }

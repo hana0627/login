@@ -40,7 +40,7 @@ class UserService(
 
     fun login(dto: UserLogin): UserEntity {
 
-        val user:UserEntity = userCacheRepository.getUser(dto.userId) ?:
+        val user:UserEntity = userCacheRepository.findByUserId(dto.userId) ?:
             getUserByUserIdOrException(dto.userId)
         if (!passwordEncoder.matches(dto.password, user.password)) {
             throw ApplicationException(ErrorCode.USER_NOT_FOUNT, "회원 정보가 없습니다.")
@@ -50,6 +50,7 @@ class UserService(
     }
 
     fun duplicateUser(userId: String): Boolean {
+        //TODO 캐시 활용했어도 좋았었을 것 같다.
         if (userRepository.findByUserId(userId) != null) {
             throw ApplicationException(ErrorCode.DUPLICATED_USER_ID, "이미 가입된 회원입니다.")
         }
@@ -63,7 +64,7 @@ class UserService(
     }
 
     fun getUserSimpleInformation(userId: String): UserInformation {
-        val user: UserEntity = userCacheRepository.getUser(userId)?:
+        val user: UserEntity = userCacheRepository.findByUserId(userId)?:
             getUserByUserIdOrException(userId)
         return UserInformation(userId = user.userId, userName = user.userName, phoneNumber = user.phoneNumber)
     }

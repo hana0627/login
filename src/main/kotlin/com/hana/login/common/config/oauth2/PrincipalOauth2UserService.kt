@@ -86,7 +86,7 @@ class PrincipalOauth2UserService(
         val phoneNumber: String = oauth2UserInfo.getPhoneNumber() ?: "010-0000-0000"
         val gender: Gender = oauth2UserInfo.getGender()
 
-        val optionalUser: UserEntity? = userCacheRepository.getUser(userId)?: userRepository.findByUserId(userId)
+        val optionalUser: UserEntity? = userCacheRepository.findByUserId(userId)?: userRepository.findByUserId(userId)
         val userEntity: UserEntity
 
         if (optionalUser == null) {

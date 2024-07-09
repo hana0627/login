@@ -1,6 +1,7 @@
 package com.hana.login.user.controller
 
 import com.hana.login.common.controller.response.Response
+import com.hana.login.common.domain.CustomUserDetails
 import com.hana.login.common.utils.JwtUtils
 import com.hana.login.user.controller.request.UserCreate
 import com.hana.login.user.controller.request.UserLogin
@@ -10,8 +11,7 @@ import com.hana.login.user.service.UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.RequiredArgsConstructor
-import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -56,9 +56,9 @@ class UserController (
 
     @GetMapping("/api/v2/auth")
     fun MyPage(
-        authentication: Authentication
+        @AuthenticationPrincipal customUserDetails: CustomUserDetails
     ): Response<UserInformation> {
-        val userId: String = authentication.principal.toString()
+        val userId: String = customUserDetails.name
         val result: UserInformation = userService.getUserSimpleInformation(userId)
         return Response.success(result)
     }
@@ -66,8 +66,8 @@ class UserController (
     @GetMapping("/api/v2/logout")
     fun logout(
         request: HttpServletRequest,
-        authentication: Authentication): Response<Boolean> {
-        val userId: String = authentication.principal.toString()
+        @AuthenticationPrincipal customUserDetails: CustomUserDetails): Response<Boolean> {
+        val userId: String = customUserDetails.name
         val result = jwtUtils.logout(request, userId)
         return Response.success(result)
     }
