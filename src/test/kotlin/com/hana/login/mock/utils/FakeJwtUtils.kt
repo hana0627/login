@@ -1,3 +1,24 @@
+/**
+ * ~~
+ * 20240705_HANA
+ * 처음에는 토큰값이 수시로 변경되어 FakeJwtUtil 클래스를 만들어서 값을 제어했는데
+ * 기존 통합테스트 SpringBootTest 에서 단위테스트인 WebMvcTest으로 변경하면서
+ * 의존성 주입을 위해 불필요한 @Bean이 생성되고, 테스트코드의 작성에 어려움을 겪었다.
+ * 본 클래스를 대신하여
+ * @MockBean 사용을 통해 값을 제어할 예정
+ * ~~
+ * 20240705_HANA
+ * 캐시생성과 같은 내부 로직 구현은 단순히 willReturn() 구문에서 작성하기 어려웠다.
+ * api 호출시 캐시가 제대로 생성되었는지 확인하기 위해서
+ * FakeJwtUtils를 사용하는것으로 결정.
+ * 단순히 mocking으로 해결하기 힘든 코드인 것 같다.
+ * 좀 더 나은 방법이 있을것으로 예상됨
+ *
+ * 20240709_HANA
+ * 메서드에 호출에 대한 응답만 적절히 작성했어도 되었을 것 같은데
+ * FakeClass를 너무 상세하게 작성했다는 생각이 든다.
+ */
+
 package com.hana.login.mock.utils
 
 import com.hana.login.common.domain.LoginLog
@@ -14,8 +35,6 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.web.server.Cookie
 import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
@@ -24,15 +43,14 @@ import java.security.Key
 import java.time.LocalDateTime
 import java.util.*
 
-@SpringBootTest
-class FakeJwtUtils @Autowired constructor(
+class FakeJwtUtils (
     private val tokenCacheRepository: TokenCacheRepository,
     private val userCacheRepository: UserCacheRepository,
     private val loginLogRepository: LoginLogRepository,
 ) : JwtUtils{
 
 
-    private val secretKey: String = "testSecret01234567890testSecrettest0987654321"
+    private val secretKey: String = "testSecret.01234567890.testSecrettest0987654321"
 
     private val expiredMs: Long = 1800
 
@@ -69,8 +87,6 @@ class FakeJwtUtils @Autowired constructor(
             )
         )
 
-
-
         return createToken(secretKey, userId, userName, expiredMs)
     }
 
@@ -106,14 +122,14 @@ class FakeJwtUtils @Autowired constructor(
         // 신규토큰 생성
         val newToken = createToken(secretKey, getUserId(accessToken), getUserName(accessToken),  expiredMs)
 
-        val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
-        val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
+//        val refreshTokenExpired: Date = extreactClaims(refreshToken).expiration
+//        val newTokenExpired: Date = Date(System.currentTimeMillis() + expiredMs * 1000)
 
         // newAccessToken의 만료시간이 refreshToken의 만료시간보다 길면 refreshToken 갱신
-        if (newTokenExpired > refreshTokenExpired) {
-            val refreshCookie: ResponseCookie = createRefreshToken(getUserId(accessToken))
-            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-        }
+//        if (newTokenExpired > refreshTokenExpired) {
+//            val refreshCookie: ResponseCookie = createRefreshToken(getUserId(accessToken))
+//            response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+//        }
         return newToken
     }
 
@@ -151,8 +167,6 @@ class FakeJwtUtils @Autowired constructor(
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "토큰 정보가 일치하지 않습니다.")
         }
 
-        // refreshToken이 DB에 저장되어 있는지 확인
-//        if(tokenRepository.findById(getUserId(refreshToken)).isEmpty) {
         if(tokenCacheRepository.getToken(getUserId(refreshToken)) == null) {
             throw ApplicationException(ErrorCode.UNAUTHORIZED, "유효하지 않은 토큰입니다")
         }
@@ -167,7 +181,6 @@ class FakeJwtUtils @Autowired constructor(
         if (secretKey == null || expiredMs == null) {
             throw ApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,"key 혹은 expiredMs가 존재하지 않습니다.")
         }
-
         return Jwts.parserBuilder().setSigningKey(getKey(secretKey))
             .build().parseClaimsJws(token).body
     }

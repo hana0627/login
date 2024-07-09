@@ -20,10 +20,6 @@ class Oauth2Test @Autowired constructor(
     private val mvc: MockMvc,
 ) {
 
-    @MockBean
-    lateinit var principalOauth2UserService: PrincipalOauth2UserService
-
-
     @Test
     fun 구글_로그인_url_요청시_302_redirect가_진행된다() {
         //given
