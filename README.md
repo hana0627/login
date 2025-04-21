@@ -55,6 +55,7 @@ https://hanaworlds.net
   <br/>
   
 # Trobule Shooting
+* [SpringBoot통합테스트 -> Mockito를 이용한 단위테스로 변경] https://velog.io/@hana0627/SpringBootTest-%ED%86%B5%ED%95%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-Mockito%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EB%8B%A8%EC%9C%84%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%A1%9C-%EB%B3%80%EA%B2%BD%ED%95%98%EA%B8%B0
 * [MySQL Aceessdenied for user 문제](https://velog.io/@hana0627/Ubuntu-Docker%EC%97%90%EC%84%9C-MySQL-%EC%82%AC%EC%9A%A9%EC%8B%9C-Access-denied-for-user-rootlocalhost)
 * (jwt 인증시 db호출 없애기, redis를 활용한 refresh토큰 관리, oauth2 연결, ssl 인증서연결, jenkins 빌드실패 문제, 프리티어 메모리 문제
   등의 문제를 만났으나, 따로 포스팅으로 남기진 않았습니다.
